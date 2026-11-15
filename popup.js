@@ -153,14 +153,28 @@ const isSelected = selectedPoints.some(
             window.location.href = url;
           }
 
-          if (action === "googlemaps") {
+if (action === "googlemaps") {
   const label = encodeURIComponent(p.name || "Точка");
+  const lat = p.lat;
+  const lon = p.lon;
 
-            const url =
-              `intent://maps.google.com/maps?q=${p.lat},${p.lon}(${label})` +
-              `#Intent;scheme=https;package=com.google.android.apps.maps;end`;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-            window.location.href = url;
+  let url;
+
+  if (isIOS) {
+    // Google Maps на iOS
+    url = `https://maps.google.com/?q=${lat},${lon}&label=${label}`;
+    // или Apple Maps:
+    // url = `maps://?q=${label}&ll=${lat},${lon}`;
+  } else {
+    // Android intent
+    url =
+      `intent://maps.google.com/maps?q=${lat},${lon}(${label})` +
+      `#Intent;scheme=https;package=com.google.android.apps.maps;end`;
+  }
+
+  window.location.href = url;
 }
 
           if (action === "yandex") {
