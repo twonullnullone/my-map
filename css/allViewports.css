@@ -1,0 +1,563 @@
+
+/* ================================
+   MODAL OVERLAY
+================================ */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    padding: 12px;
+    box-sizing: border-box;
+
+    background: rgba(0, 0, 0, 0.0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease,
+        background 0.35s ease,
+        backdrop-filter 0.35s ease,
+        visibility 0s linear 0.35s;
+}
+
+/* Открытое состояние */
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+
+    transition:
+        opacity 0.35s ease,
+        background 0.35s ease,
+        backdrop-filter 0.35s ease,
+        visibility 0s;
+}
+
+
+/* ================================
+   MODAL CONTENT
+================================ */
+
+.modal-content {
+    position: relative;
+
+    width: 100%;
+    max-width: 500px;
+    max-height: 88%;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: linear-gradient(
+        145deg,
+        rgba(35, 35, 38, 0.98),
+        rgba(19, 19, 22, 0.98)
+    );
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 24px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+    transform: translateY(110%) scale(0.96);
+    opacity: 0;
+
+    transition:
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.3s ease;
+    will-change: transform, opacity;
+}
+
+/* Появление снизу */
+
+.modal.active .modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+
+/* ================================
+   TITLE
+================================ */
+
+.modal-content h3 {
+    margin: 20px 20px 12px;
+
+    color: #fff;
+    font-size: 19px;
+    font-weight: 600;
+    text-align: center;
+}
+
+
+/* ================================
+   SEARCH INPUT
+================================ */
+
+#filterSearch {
+    display: block;
+    width: calc(100% - 40px);
+    box-sizing: border-box;
+
+    margin: 8px auto 12px;
+    padding: 13px 16px;
+
+    color: #fff;
+    font-size: 15px;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    outline: none;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+#filterSearch::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+#filterSearch:focus {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(100, 170, 255, 0.5);
+    box-shadow: 0 0 0 3px rgba(100, 170, 255, 0.08);
+}
+
+
+/* ================================
+   LIST
+================================ */
+
+.modal-list {
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    padding: 10px 16px 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+
+    background: transparent;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+.modal-list > * {
+    padding: 13px 15px;
+
+    color: #eee;
+    background: rgba(255, 255, 255, 0.055);
+
+    border: 1px solid rgba(255, 255, 255, 0.045);
+    border-radius: 13px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.modal-list > *:hover {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.modal-list > *:active {
+    transform: scale(0.98);
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+
+    background: rgba(0, 0, 0, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.modal-footer button {
+    flex: 1;
+
+    padding: 13px 15px;
+
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 13px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.modal-footer button:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.modal-footer button:active {
+    transform: scale(0.97);
+}
+
+
+/* ================================
+   CLOSE BUTTON
+================================ */
+
+.modal-close-button {
+    margin: 16px;
+    padding: 13px 20px;
+
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+
+    background: linear-gradient(135deg, #ff5f6d, #ff3d57);
+
+    border: none;
+    border-radius: 13px;
+
+    box-shadow: 0 6px 18px rgba(255, 61, 87, 0.22);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.modal-close-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 24px rgba(255, 61, 87, 0.3);
+}
+
+.modal-close-button:active {
+    transform: scale(0.97);
+}
+
+.modal-close-button:focus {
+    outline: none;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+    .modal {
+        padding: 8px;
+    }
+
+    .modal-content {
+        max-height: 85%;
+        border-radius: 23px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal,
+    .modal-content,
+    .modal * {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==============================
+   MODAL WINDOW
+============================== */
+
+.modal-contents {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 80%;
+
+    box-sizing: border-box;
+
+    background: #f4f5f6;
+    border-radius: 22px 22px 0 0;
+
+    overflow: hidden;
+    text-align: center;
+
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.12);
+
+    /* Анимация снизу */
+    transform: translateY(100%);
+    visibility: hidden;
+/*
+ transition:
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.8s;*/
+     transition: transform 0.35s ease-in;
+}
+
+.modal-contents.active {
+    transform: translateY(0);
+    visibility: visible;
+       transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* ==============================
+   TEXT AREA
+============================== */
+
+#searchText {
+    display: block;
+
+    width: 97%;
+    height: 70%;
+
+    margin: 0 auto;
+    padding: 18px;
+
+    box-sizing: border-box;
+
+    border: none;
+    outline: none;
+    resize: none;
+
+    font-size: 16px;
+    font-family: inherit;
+    line-height: 1.5;
+
+    color: #303943;
+    background: #f4f5f6;
+
+    border-radius: 12px;
+}
+
+#searchText::placeholder {
+    color: #9299a1;
+}
+
+
+/* ==============================
+   BUTTONS CONTAINER
+============================== */
+
+.modal-buttons {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    padding: 12px 16px;
+
+    box-sizing: border-box;
+    gap: 12px;
+}
+
+
+/* ==============================
+   BUTTONS
+============================== */
+
+.modal-buttons button {
+    flex: 1;
+
+    height: 50px;
+
+    border: none;
+    outline: none;
+
+    cursor: pointer;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+
+    transition:
+        background 0.25s,
+        transform 0.2s;
+}
+
+
+/* OK BUTTON */
+
+#okBtn {
+    background: #303943;
+    color: #ffffff;
+
+    border-radius: 15px 30px 30px 15px;
+}
+
+
+/* CANCEL BUTTON */
+
+#cancelBtn {
+    background: #e1e5e9;
+    color: #424b55;
+
+    border-radius: 30px 15px 15px 30px;
+}
+
+
+/* ==============================
+   BUTTON TEXT ANIMATION
+============================== */
+
+#okBtn span,
+#cancelBtn span {
+    display: inline-block;
+    position: relative;
+
+    transition: 0.35s;
+}
+
+
+/* CHECK ICON */
+
+#okBtn span::after {
+    content: "✓";
+
+    position: absolute;
+    top: 0;
+    right: -25px;
+
+    opacity: 0;
+    transition: 0.35s;
+}
+
+
+/* CANCEL ICON */
+
+#cancelBtn span::after {
+    content: "✕";
+
+    position: absolute;
+    top: 0;
+    right: -25px;
+
+    opacity: 0;
+    transition: 0.35s;
+}
+
+
+/* HOVER EFFECT */
+
+#okBtn:hover span,
+#cancelBtn:hover span {
+    padding-right: 25px;
+}
+
+#okBtn:hover span::after,
+#cancelBtn:hover span::after {
+    opacity: 1;
+    right: 0;
+}
+
+
+/* ==============================
+   ACTIVE EFFECT
+============================== */
+
+#okBtn:active {
+    background: #465361;
+    transform: scale(0.98);
+}
+
+#cancelBtn:active {
+    background: #d3d9df;
+    transform: scale(0.98);
+}
+
+
+
+
+/* Затемнение фона */
+#searchModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+
+    z-index: 99999;
+
+    background: rgba(0, 0, 0, 0);
+       transition: background 0.35s ease;
+}
+
+#searchModal.active {
+    background: rgba(0, 0, 0, 0.45);
+     transition: background 0.8s ease;
+}
+
+.modal-contents {
+    position: absolute;
+    z-index: 100000;
+
+    left: 0;
+    bottom: 0;
+}
+
+
+
+/* ==============================
+   MOBILE TOUCH
+============================== */
+
+@media (hover: none) {
+    #okBtn:hover span,
+    #cancelBtn:hover span {
+        padding-right: 0;
+    }
+
+    #okBtn:hover span::after,
+    #cancelBtn:hover span::after {
+        opacity: 0;
+    }
+}
