@@ -251,10 +251,13 @@ function scanPointsInSquare() {
   const sx2 = cx + half;
   const sy2 = cy + half;
 
+  // Добавь эту строку
+  ensureBoxLayer();
+
   // обновляем рамку
   map.getSource("frame-geo").setData(getSquareFrame(padding));
 
-  // ❌ исключаем точки, которые уже в localStorage
+  // остальной код без изменений
   visiblePoints = pts.filter((p) => {
     const isActive = activePoints.some(
       (a) => a.lat === p.lat && a.lon === p.lon
