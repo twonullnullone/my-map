@@ -369,7 +369,7 @@ body::after {
 
   border: none;          /* убрать рамку */
   background-color: transparent; /* прозрачный фон */
-  background-image: url('../src/layers.png'); /* путь к SVG */
+  background-image: url('src/layers.png'); /* путь к SVG */
   background-size: contain; /* масштабируем под размер кнопки */
   background-repeat: no-repeat; /* не повторять */
   background-position: center; /* центрировать */
