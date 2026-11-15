@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>Sergek</title>
+
+    <!-- <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.css"
+    />
+   <script src="https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="css/button.css" />
+    <link rel="stylesheet" type="text/css" href="css/footerButton.css" />
+    <link rel="stylesheet" type="text/css" href="css/search.css" />
+    <link rel="stylesheet" type="text/css" href="css/allViewports.css" />
+    <link rel="stylesheet" href="mapstyle/maplibre-gl.css">
+
+<script src="mapstyle/maplibre-gl.js"></script>
+  </head>
+  <body>
+        <!-- From Uiverse.io by alexruix --> 
+    <div class="containerLoader">
+<div class="loader"></div>
+</div>
+
+  <div id="map"></div>
+
+       <button class="ibutton">
+      Zerek
+      <span class="ibutton-span"> ─ Maps</span>
+    </button>
+
+  
+
+<div id="bottomSlider">
+
+    <!-- Первый экран -->
+    <div id="bottomBar" class="slide active">
+
+        <button id="jsonedit"></button>
+        <button id="cameraBtn"></button>
+        <button id="refreshLocationBtn"></button>
+        <button id="textScan"></button>
+
+        <label id="menuToggle">
+            <input type="checkbox" />
+            <svg viewBox="0 0 32 32">
+                <path
+                    class="line line-top-bottom"
+                    d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22">
+                </path>
+                <path class="line" d="M7 16 27 16"></path>
+            </svg>
+        </label>
+
+    </div>
+
+    <!-- Второй экран -->
+    <div id="controlPanel" class="slide next">
+
+        <div class="blur-background"></div>
+
+        <div class="panel-content">
+
+            <div class="grid-buttons">
+                <button id="routeBtn"></button>
+                <button id="setLocationBtn"></button>
+                <button id="project"></button>
+                <button id="scanPoitns"></button>
+                <button id="filterBtn"></button>
+                 <button id="mapStyle"></button>
+            </div>
+
+            <div class="glass-radio-group">
+                <input type="radio" name="plan" id="glass-not" checked />
+                <label for="glass-not">NOT</label>
+
+                <input type="radio" name="plan" id="glass-p" />
+                <label for="glass-p">P</label>
+
+                <input type="radio" name="plan" id="glass-lu" />
+                <label for="glass-lu">LU</label>
+
+                <input type="radio" name="plan" id="glass-ovn" />
+                <label for="glass-ovn">OVN</label>
+
+                <input type="radio" name="plan" id="glass-all" />
+                <label for="glass-all">ALL</label>
+
+                <div class="glass-glider"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div id="search-panel" class="slide next">
+      <div class="search-bar">
+        <!-- Иконка поиска -->
+        <svg class="search-icon-svg" viewBox="0 0 24 24">
+          <path
+            d="M10 2a8 8 0 015.292 13.708l5 5a1 1 0 01-1.414 1.414l-5-5A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"
+          />
+        </svg>
+
+        <!-- Поле ввода -->
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Поиск..."
+          autocomplete="off"
+        />
+
+        <!-- Кнопка очистки -->
+        <button id="clear-btn" class="clear-btn" title="Очистить">
+          <svg class="clear-icon-svg" viewBox="0 0 24 24">
+            <path
+              d="M6 6l12 12M6 18L18 6"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <ul id="suggestions"></ul>
+    </div>
+
+</div>
+ 
+
+
+
+
+
+    <div id="filterModal" class="modal">
+      <div class="modal-content">
+        <h3>Все координаты</h3>
+        <div class=".searchBar">
+          <input
+            type="text"
+            id="filterSearch"
+            placeholder="Поиск..."
+           
+          />
+        </div>
+        <div id="filterList" class="modal-list"></div>
+        <div class="modal-footer">
+          <button id="resetFilterBtn" style="background: #c00">Сброс</button>
+          <button onclick="closeModal('filterModal')">Закрыть</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAMERA MODAL -->
+    <div id="cameraModal" class="modal">
+      <div class="modal-content">
+        <h3>Zoom</h3>
+        <div id="cameraList" class="modal-list"></div>
+        <button class="modal-close-button" onclick="closeModal('cameraModal')">
+    Закрыть
+</button>
+      </div>
+    </div>
+
+    <!-- ROUTE MODAL -->
+    <div id="routeModal" class="modal">
+      <div class="modal-content">
+        <h3>Построить маршрут</h3>
+        <div id="routeList" class="modal-list"></div>
+        <div class="modal-footer">
+          <button id="buildRouteBtn">Построить</button>
+          <button id="endRouteBtn">Завершить</button>
+          <button onclick="closeModal('routeModal')">Закрыть</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="searchModal" class="modal">
+
+  <div class="modal-contents">
+    <h3 class="mex group">
+    <span class="corner top">
+        <span class="diamond"></span>
+    </span>
+
+    <span class="corner bottom">
+        <span class="diamond"></span>
+    </span>
+
+    <span class="fill"></span>
+
+    <span class="text">Text search</span>
+</h3>
+
+    <textarea id="searchText"placeholder="Введите название объекта или скопируйте и вставьте все задания...."></textarea>
+
+   <div class="modal-buttons">
+    <button id="cancelBtn">Отмена</button>
+    <button id="okBtn">Поиск</button>
+</div>
+  </div>
+</div>
+
+<!--<button id="sergek-theme-open">Стили карты</button>-->
+
+<div id="sergek-theme-overlay"></div>
+
+<div id="sergek-theme-sheet">
+
+    <button id="sergek-theme-close">×</button>
+
+    <!--<div class="sergek-theme-title">Стиль карты</div>-->
+
+    <div class="sergek-theme-list">
+        <label><input type="radio" name="sergek-theme" value="default"> Standard</label>
+        <label><input type="radio" name="sergek-theme" value="black3" checked> Black</label>
+        <label><input type="radio" name="sergek-theme" value="blue"> Blue</label>
+        <label><input type="radio" name="sergek-theme" value="green"> Green</label>
+        <label><input type="radio" name="sergek-theme" value="white"> White</label>
+        <label><input type="radio" name="sergek-theme" value="dark"> Dark</label>
+        <label><input type="radio" name="sergek-theme" value="light"> Light</label>
+        <label><input type="radio" name="sergek-theme" value="gray"> Gray</label>
+        <label><input type="radio" name="sergek-theme" value="night"> Night</label>
+        <label><input type="radio" name="sergek-theme" value="pastel"> Pastel</label>
+        <label><input type="radio" name="sergek-theme" value="retro"> Retro</label>
+        <label><input type="radio" name="sergek-theme" value="terrain"> Terrain</label>
+        <label><input type="radio" name="sergek-theme" value="satellite"> Satellite</label>
+        <label><input type="radio" name="sergek-theme" value="minimal"> Minimal</label>
+        <label><input type="radio" name="sergek-theme" value="contrast"> Contrast</label>
+    </div>
+
+</div>
+    <script>
+      function openModal(id) {
+        document.getElementById(id).style.display = "block";
+      }
+      function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+      }
+    </script>
+
+    <script src="script.js"></script>
+    <script src="search.js"></script>
+    <script src="popup.js"></script>
+    <script src="cat.js"></script>
+    <script src="geolocation.js"></script>
+    <script src="route.js"></script>
+    <!-- <script src="style.js"></script> -->
+    <script src="scanner.js"></script>
+    <!--<script src="luch.js"></script>-->
+  </body>
+</html>

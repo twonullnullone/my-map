@@ -1,0 +1,362 @@
+#controlPanel {
+    position: fixed;
+    width: 400px;
+    left: 50%;
+    bottom: 0px;
+    max-width: 300px;
+
+    transform: translate(-50%, 100%);
+
+    transform-origin: center;
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.08),
+        rgba(255,255,255,.035)
+    );
+
+
+   
+    pointer-events: none;
+
+    transition:
+        transform .45s cubic-bezier(.22, 1, .36, 1),
+        opacity .35s ease;
+
+    z-index: 1500;
+
+}
+
+#controlPanel.active {
+     transform: translate(-50%, 0%);
+   bottom: 130px;
+    pointer-events: auto;
+}
+
+.panel-content {
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    padding: 20px;
+
+ 
+
+   backdrop-filter: blur(3px) saturate(10%);
+   
+
+    border: 1px solid rgb(255 255 255 / 55%);
+
+    border-radius: 28px;
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+
+/* мягкое цветное свечение */
+.panel-content::before {
+    content: "";
+
+    position: absolute;
+    inset: -50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(120,80,255,.25),
+            transparent 55%
+        );
+
+    opacity: .5;
+    pointer-events: none;
+}
+
+#filterBtn {
+
+  border: none;          /* убрать рамку */
+  background-color: transparent; /* прозрачный фон */
+  background-image: url('../src/list.png'); /* путь к SVG */
+  background-size: contain; /* масштабируем под размер кнопки */
+  background-repeat: no-repeat; /* не повторять */
+  background-position: center; /* центрировать */
+  cursor: pointer;       /* курсор при наведении */
+
+}
+
+
+
+
+#routeBtn {
+
+  border: none;          /* убрать рамку */
+  background-color: transparent; /* прозрачный фон */
+  background-image: url('../src/route.png'); /* путь к SVG */
+  background-size: contain; /* масштабируем под размер кнопки */
+  background-repeat: no-repeat; /* не повторять */
+  background-position: center; /* центрировать */
+  cursor: pointer;       /* курсор при наведении */
+}
+
+#setLocationBtn {
+  border: none;
+  background-color: transparent;
+  background-image: url('../src/compass.png');
+  background-size: 45px 45px;   /* <-- конкретный размер */
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
+
+
+
+#project {
+  
+  border: none;          /* убрать рамку */
+  background-color: transparent; /* прозрачный фон */
+  background-image: url('../src/earth.png'); /* путь к SVG */
+  background-size: contain; /* масштабируем под размер кнопки */
+  background-repeat: no-repeat; /* не повторять */
+  background-position: center; /* центрировать */
+  cursor: pointer;       /* курсор при наведении */
+}
+
+#scanPoitns {
+
+    border: none;
+  background-color: transparent;
+  background-image: url('../src/scanner.png');
+  background-size: 45px 45px;   /* <-- конкретный размер */
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
+
+
+
+
+
+
+.grid-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.grid-buttons button {
+     width: 55px;
+  height: 55px;
+  border: none;
+  border-radius: 12px;
+
+  color: #fff;
+  font-size: 22px;
+ 
+
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  
+     border: 1px solid rgba(255,255,255,.08);
+
+    color: white;
+
+
+    cursor: pointer;
+
+    transition:
+        transform .25s,
+        background .25s,
+        box-shadow .25s;
+}
+
+
+
+
+.grid-buttons button:active {
+    transform: scale(.95);
+}
+
+/* Радиокнопки */
+.glass-radio-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px;
+    row-gap: 20px;
+    align-items: center;
+}
+
+/* Скрываем radio */
+.glass-radio-group input {
+    display: none;
+}
+
+/* Текст */
+.glass-radio-group label {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    padding-left: 50px;
+    min-height: 28px;
+
+    cursor: pointer;
+    user-select: none;
+
+    color: rgb(177, 176, 176);
+    font-size: 16px;
+    font-weight: 700;
+    font-family: monospace;
+
+    transition: .3s;
+}
+
+/* Кольцо */
+.glass-radio-group label::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+    border: 6px solid rgba(245,245,245,.45);
+
+    background: transparent;
+
+    box-shadow:
+        0 0 20px -13px gray,
+        inset 0 0 20px -14px gray;
+}
+
+/* Шарик */
+.glass-radio-group label::after {
+    content: "";
+
+    position: absolute;
+    left: 19.5px;
+    top: 50%;
+
+    width: 16px;
+    height: 16px;
+
+    border-radius: 50%;
+
+    background: rgb(232,232,232);
+
+    box-shadow:
+        rgba(0,0,0,.17) 0px -10px 10px inset,
+        rgba(0,0,0,.15) 0px -15px 15px inset,
+        rgba(0,0,0,.1) 0px -40px 20px inset,
+        rgba(0,0,0,.06) 0px 2px 1px,
+        rgba(0,0,0,.09) 0px 4px 2px,
+        rgba(0,0,0,.09) 0px 8px 4px,
+        rgba(0,0,0,.09) 0px 16px 8px,
+        rgba(0,0,0,.09) 0px 32px 16px;
+
+    transform: translate(-80px, -50%);
+        opacity: 0;
+    filter: blur(8px);
+
+    transition: 900ms cubic-bezier(1,-0.4,0,1.4);
+}
+
+/* Выбранный пункт */
+.glass-radio-group input:checked + label::after {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    filter: blur(0);
+
+        background: var(--radio-color, rgb(232,232,232));
+
+    box-shadow:
+        0 0 10px var(--radio-color, rgb(232,232,232)),
+        0 0 20px var(--radio-color, rgb(232,232,232)),
+        rgba(0,0,0,.17) 0 -10px 10px inset,
+        rgba(0,0,0,.15) 0 -15px 15px inset,
+        rgba(0,0,0,.10) 0 -40px 20px inset;
+}
+
+.glass-radio-group input:checked + label {
+    color: #000;
+}
+
+#glass-not + label {
+    --radio-color: #3b82f6;
+}
+
+#glass-p + label {
+    --radio-color: #22c55e;
+}
+
+#glass-lu + label {
+    --radio-color: #f59e0b;
+}
+
+#glass-ovn + label {
+    --radio-color: #ef4444;
+}
+
+#glass-all + label {
+    --radio-color: #a855f7;
+}
+
+/* Левая колонка */
+#glass-not + label {
+    grid-column: 1;
+    grid-row: 1;
+   /* синий */
+}
+
+#glass-p + label {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#glass-lu + label {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+/* Правая колонка */
+#glass-ovn + label {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#glass-all + label {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* Старый glider отключаем */
+.glass-glider {
+    display: none;
+}
+
+#controlPanel.active .glass-radio-group {
+    transform: translateY(0);
+   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
