@@ -508,3 +508,52 @@ map.on("load", () => {
     startWatchingPosition();
 
 });
+
+// =====================================
+// RADAR DEBUG PANEL — ДЛЯ ТЕЛЕФОНА
+// =====================================
+
+const debugPanel = document.createElement("div");
+
+debugPanel.id = "radarDebugPanel";
+
+Object.assign(debugPanel.style, {
+    position: "fixed",
+    top: "10px",
+    left: "10px",
+    zIndex: "999999",
+    width: "190px",
+    padding: "10px",
+    background: "rgba(0, 0, 0, 0.85)",
+    color: "#00ff88",
+    font: "12px monospace",
+    borderRadius: "8px",
+    pointerEvents: "none",
+    whiteSpace: "pre-line",
+    lineHeight: "1.5",
+    boxSizing: "border-box"
+});
+
+document.body.appendChild(debugPanel);
+
+function updateRadarDebug() {
+    const values = {
+        marker: !!userMarker,
+        GPS: !!userCoords,
+        render: !!renderCoords,
+        source: !!map.getSource("userRadar"),
+        circle: !!map.getLayer("userRadarCircle"),
+        sector: !!map.getLayer("userRadarSector"),
+        follow: following,
+        style: map.isStyleLoaded(),
+        init: typeof initRadarLayer,
+        layers: map.getStyle()?.layers?.length ?? 0
+    };
+
+    debugPanel.textContent = Object.entries(values)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join("\n");
+}
+
+setInterval(updateRadarDebug, 1000);
+updateRadarDebug();
