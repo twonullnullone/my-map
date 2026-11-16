@@ -782,6 +782,6 @@ function updateRadarDebug() {
         .join("\n");
 }
 
-setInterval(updateRadarDebug, 1000);
+//setInterval(updateRadarDebug, 1000);
 
-updateRadarDebug();
+//updateRadarDebug();
