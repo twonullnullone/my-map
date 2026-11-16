@@ -107,62 +107,90 @@ function buildCircle(center, radiusMeters, steps = 64) {
 // ===================================
 // ИНИЦИАЛИЗАЦИЯ СЛОЁВ
 // ===================================
+
 function initRadarLayer(map) {
-  if (map.getSource("userRadar")) return;
+    if (!map.isStyleLoaded()) return;
 
-  map.addSource("userRadar", {
-    type: "geojson",
-    data: { type: "FeatureCollection", features: [] },
-  });
+    if (!map.getSource("userRadar")) {
+        map.addSource("userRadar", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: []
+            }
+        });
+    }
 
-  // КРУГ
-  map.addLayer({
-    id: "userRadarCircle",
-    type: "fill",
-    source: "userRadar",
-    filter: ["==", ["get", "shape"], "circle"],
-    paint: {
-      "fill-color": "rgba(0,200,83,0.15)",
-      "fill-outline-color": "rgba(0,200,83,0.4)",
-    },
-  });
+    if (!map.getLayer("userRadarCircle")) {
+        map.addLayer({
+            id: "userRadarCircle",
+            type: "fill",
+            source: "userRadar",
+            filter: ["==", ["get", "shape"], "circle"],
+            paint: {
+                "fill-color": "rgba(0,200,83,0.15)",
+                "fill-outline-color": "rgba(0,200,83,0.4)"
+            }
+        });
+    }
 
-  // СЕКТОР
-  map.addLayer({
-    id: "userRadarSector",
-    type: "fill",
-    source: "userRadar",
-    filter: ["==", ["get", "shape"], "sector"],
-    paint: {
-      "fill-color": "rgba(0,200,83,0.35)",
-      "fill-outline-color": "rgba(0,200,83,0.8)",
-    },
-  });
+    if (!map.getLayer("userRadarSector")) {
+        map.addLayer({
+            id: "userRadarSector",
+            type: "fill",
+            source: "userRadar",
+            filter: ["==", ["get", "shape"], "sector"],
+            paint: {
+                "fill-color": "rgba(0,200,83,0.35)",
+                "fill-outline-color": "rgba(0,200,83,0.8)"
+            }
+        });
+    }
+
+    updateRadar(map);
 }
+
 
 // ===================================
 // ОБНОВЛЕНИЕ РАДАРА
 // ===================================
+
 function updateRadar(map) {
-  if (!userCoords || !map.getSource("userRadar")) return;
+    if (!userCoords || !map.getSource("userRadar")) return;
 
-  if (!following) {
-    map.getSource("userRadar").setData({
-      type: "FeatureCollection",
-      features: [],
+    const source = map.getSource("userRadar");
+
+    if (!following) {
+        source.setData({
+            type: "FeatureCollection",
+            features: []
+        });
+        return;
+    }
+
+    const center = renderCoords || userCoords;
+
+    source.setData({
+        type: "FeatureCollection",
+        features: [
+            {
+                type: "Feature",
+                properties: { shape: "circle" },
+                geometry: buildCircle(center, DIST_METERS)
+            },
+            {
+                type: "Feature",
+                properties: { shape: "sector" },
+                geometry: buildConePolygon(
+                    center,
+                    userHeading,
+                    FOV_DEG,
+                    DIST_METERS
+                )
+            }
+        ]
     });
-    return;
-  }
-
-const center = renderCoords || userCoords;
-
-const circle = buildCircle(center, DIST_METERS);
-const sector = buildConePolygon(
-  center,
-  userHeading,
-  FOV_DEG,
-  DIST_METERS
-);
+}
 
 
   map.getSource("userRadar").setData({
