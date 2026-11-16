@@ -18,7 +18,7 @@ const RADAR_SOURCE = "userRadar";
 
 let following = false;
 
-
+//let userMarker = null;
 let userCoords = null;
 let targetCoords = null;
 let renderCoords = null;
@@ -132,122 +132,106 @@ function buildConePolygon(center, bearing, fov, radius) {
 
 function initRadarLayer() {
 
-    if (!map || !map.isStyleLoaded()) {
-        console.log("Radar: карта ещё не готова");
-        return;
+    if (!map.isStyleLoaded()) return;
+
+    if (!map.getSource(RADAR_SOURCE)) {
+        map.addSource(RADAR_SOURCE, {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: []
+            }
+        });
     }
 
-    console.log("Radar: инициализация");
-
-    // Удаляем старые слои, если они остались
-    if (map.getLayer("userRadarSector")) {
-        map.removeLayer("userRadarSector");
+    if (!map.getLayer("userRadarCircle")) {
+        map.addLayer({
+            id: "userRadarCircle",
+            type: "fill",
+            source: RADAR_SOURCE,
+            filter: ["==", ["get", "shape"], "circle"],
+            paint: {
+                "fill-color": "rgba(0,200,83,0.15)",
+                "fill-outline-color": "rgba(0,200,83,0.4)"
+            }
+        });
     }
 
-    if (map.getLayer("userRadarCircle")) {
-        map.removeLayer("userRadarCircle");
+    if (!map.getLayer("userRadarSector")) {
+        map.addLayer({
+            id: "userRadarSector",
+            type: "fill",
+            source: RADAR_SOURCE,
+            filter: ["==", ["get", "shape"], "sector"],
+            paint: {
+                "fill-color": "rgba(0,200,83,0.35)",
+                "fill-outline-color": "rgba(0,200,83,0.8)"
+            }
+        });
     }
-
-    if (map.getSource(RADAR_SOURCE)) {
-        map.removeSource(RADAR_SOURCE);
-    }
-
-    // Создаём источник
-    map.addSource(RADAR_SOURCE, {
-        type: "geojson",
-        data: {
-            type: "FeatureCollection",
-            features: []
-        }
-    });
-
-    // Круг
-    map.addLayer({
-        id: "userRadarCircle",
-        type: "fill",
-        source: RADAR_SOURCE,
-        filter: ["==", ["get", "shape"], "circle"],
-        paint: {
-            "fill-color": "#00e676",
-            "fill-opacity": 0.18,
-            "fill-outline-color": "#00e676"
-        }
-    });
-
-    // Сектор
-    map.addLayer({
-        id: "userRadarSector",
-        type: "fill",
-        source: RADAR_SOURCE,
-        filter: ["==", ["get", "shape"], "sector"],
-        paint: {
-            "fill-color": "#00e676",
-            "fill-opacity": 0.4,
-            "fill-outline-color": "#00e676"
-        }
-    });
-
-    console.log("Radar: успешно создан");
 
     updateRadar();
 }
 
-// =========================================
-// ОБНОВЛЕНИЕ РАДАРА
-// =========================================
 
 // =========================================
 // ОБНОВЛЕНИЕ РАДАРА
 // =========================================
 
 function updateRadar() {
-    const source = map.getSource(RADAR_SOURCE);
-    if (!source) return;
 
-    if (!userCoords || !renderCoords) {
-        source.setData({
-            type: "FeatureCollection",
-            features: []
-        });
-        return;
-    }
+    if (!map.getSource(RADAR_SOURCE)) return;
+
+    const source = map.getSource(RADAR_SOURCE);
+
+if (!following || !userCoords || !renderCoords) {
+    source.setData({ type: "FeatureCollection", features: [] });
+    return;
+}
 
     const center = renderCoords;
 
-    const features = [
-        {
-            type: "Feature",
-            properties: { shape: "circle" },
-            geometry: buildCircle(center, DIST_METERS)
-        },
-        {
-            type: "Feature",
-            properties: { shape: "sector" },
-            geometry: buildConePolygon(
-                center,
-                headingAvailable ? userHeading : 0,
-                FOV_DEG,
-                DIST_METERS
-            )
-        }
-    ];
-
     source.setData({
         type: "FeatureCollection",
-        features
+        features: [
+            {
+                type: "Feature",
+                properties: {
+                    shape: "circle"
+                },
+                geometry: buildCircle(center, DIST_METERS)
+            },
+            {
+                type: "Feature",
+                properties: {
+                    shape: "sector"
+                },
+                geometry: buildConePolygon(
+                    center,
+                    userHeading,
+                    FOV_DEG,
+                    DIST_METERS
+                )
+            }
+        ]
     });
 }
+
 
 // =========================================
 // ПЛАВНОЕ ДВИЖЕНИЕ
 // =========================================
 
 function startMarkerAnimation() {
+
     if (animationRunning) return;
+
     animationRunning = true;
 
     function loop() {
+
         if (userMarker && renderCoords && targetCoords) {
+
             const dx = targetCoords[0] - renderCoords[0];
             const dy = targetCoords[1] - renderCoords[1];
 
@@ -256,11 +240,14 @@ function startMarkerAnimation() {
 
             userMarker.setLngLat(renderCoords);
 
-            // Радар обновляем всегда (не только при following)
-            updateRadar();
+            if (following) {
+                updateRadar();
+            }
         }
+
         requestAnimationFrame(loop);
     }
+
     requestAnimationFrame(loop);
 }
 
@@ -289,33 +276,29 @@ function startWatchingPosition() {
 
             window.userCoords = userCoords;
 
-        if (!userMarker) {
-    userMarker = new maplibregl.Marker({
-        color: "#00c853"
-    })
-    .setLngLat(userCoords)
-    .addTo(map);
-}
+            if (!userMarker) {
 
-// Важно: координаты инициализируются независимо от маркера
-if (!renderCoords) {
-    renderCoords = [...userCoords];
-}
+                userMarker = new maplibregl.Marker({
+                    color: typeof hexColors !== "undefined"
+                        ? hexColors[4]
+                        : "#00c853"
+                })
+                    .setLngLat(userCoords)
+                    .addTo(map);
 
-if (!targetCoords) {
-    targetCoords = [...userCoords];
-}
+                renderCoords = [...userCoords];
+                targetCoords = [...userCoords];
 
-if (!animationRunning) {
-    startMarkerAnimation();
-}
+                startMarkerAnimation();
 
-if (distanceMeters(targetCoords, userCoords) >= MIN_MOVE) {
-    targetCoords = [...userCoords];
-}
+            } else {
 
-// Обновляем радар при каждом GPS-обновлении
-updateRadar();
+                if (
+                    distanceMeters(targetCoords, userCoords) >= MIN_MOVE
+                ) {
+                    targetCoords = [...userCoords];
+                }
+            }
 
             if (following) {
                 updateRadar();
@@ -489,9 +472,17 @@ if (refreshBtn) {
 // =========================================
 
 map.on("style.load", () => {
+
+    console.log("Map style loaded");
+
     initRadarLayer();
+
 });
 
 map.on("load", () => {
+
     startWatchingPosition();
+
+    initRadarLayer();
+
 });
