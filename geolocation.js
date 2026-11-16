@@ -1,13 +1,42 @@
-// ===================================
-// APP.JS — КРУГЛЫЙ РАДАР + СЕКТОР
-// MapLibre / Mapbox GL
-// ===================================
+
+/* =========================================
+   SERGEK — GPS RADAR + COMPASS
+   MapLibre / Mapbox GL
+========================================= */
+
+// =========================================
+// НАСТРОЙКИ
+// =========================================
+
+const SMOOTH = 0.08;
+const MIN_MOVE = 2;
+
+const FOV_DEG = 80;
+const DIST_METERS = 150;
+
+const RADAR_SOURCE = "userRadar";
+
+let following = false;
+
+let userMarker = null;
+let userCoords = null;
 let targetCoords = null;
 let renderCoords = null;
-let animationRunning = false;
 
-const SMOOTH = 0.08;      // плавность (0.05–0.15)
-const MIN_MOVE = 2;       // игнорировать меньше 2 метров
+let userHeading = 0;
+let headingAvailable = false;
+
+let watchId = null;
+let animationRunning = false;
+let orientationStarted = false;
+
+const followBtn = document.getElementById("setLocationBtn");
+const refreshBtn = document.getElementById("refreshLocationBtn");
+
+
+// =========================================
+// РАССТОЯНИЕ
+// =========================================
 
 function distanceMeters(a, b) {
     const R = 6371000;
@@ -25,94 +54,88 @@ function distanceMeters(a, b) {
 }
 
 
-
-let following = false;
-let userMarker = null;
-let userCoords = null;
-let prevCoords = null;
-let userHeading = 0;
-let watchId = null;
-
-const FOV_DEG = 80;        // угол сектора
-const DIST_METERS = 150;  // радиус круга
-
-const followBtn = document.getElementById("setLocationBtn");
-const refreshBtn = document.getElementById("refreshLocationBtn");
-
-// ===================================
-// ПОСТРОЕНИЕ СЕКТОРА
-// ===================================
-function buildConePolygon(center, bearingDeg, fovDeg, distanceMeters) {
-  const [lon, lat] = center;
-  const steps = 40;
-  const R = 6378137;
-
-  const bearingRad = bearingDeg * Math.PI / 180;
-  const halfFovRad = (fovDeg / 2) * Math.PI / 180;
-
-  const coords = [center];
-
-  for (
-    let i = -halfFovRad;
-    i <= halfFovRad;
-    i += (fovDeg * Math.PI / 180) / steps
-  ) {
-    const angle = bearingRad + i;
-    const dx =
-      (distanceMeters * Math.sin(angle)) /
-      (R * Math.cos(lat * Math.PI / 180));
-    const dy = (distanceMeters * Math.cos(angle)) / R;
-
-    coords.push([
-      lon + (dx * 180) / Math.PI,
-      lat + (dy * 180) / Math.PI,
-    ]);
-  }
-
-  coords.push(center);
-
-  return {
-    type: "Polygon",
-    coordinates: [coords],
-  };
-}
-
-// ===================================
+// =========================================
 // ПОСТРОЕНИЕ КРУГА
-// ===================================
-function buildCircle(center, radiusMeters, steps = 64) {
-  const [lon, lat] = center;
-  const R = 6378137;
-  const coords = [];
+// =========================================
 
-  for (let i = 0; i <= steps; i++) {
-    const angle = (i / steps) * Math.PI * 2;
-    const dx =
-      (radiusMeters * Math.cos(angle)) /
-      (R * Math.cos(lat * Math.PI / 180));
-    const dy = (radiusMeters * Math.sin(angle)) / R;
+function buildCircle(center, radius, steps = 64) {
+    const [lon, lat] = center;
+    const R = 6378137;
 
-    coords.push([
-      lon + (dx * 180) / Math.PI,
-      lat + (dy * 180) / Math.PI,
-    ]);
-  }
+    const coords = [];
 
-  return {
-    type: "Polygon",
-    coordinates: [coords],
-  };
+    for (let i = 0; i <= steps; i++) {
+        const angle = (i / steps) * Math.PI * 2;
+
+        const dx = radius * Math.cos(angle);
+        const dy = radius * Math.sin(angle);
+
+        const dLat = dy / R;
+        const dLon = dx / (R * Math.cos(lat * Math.PI / 180));
+
+        coords.push([
+            lon + dLon * 180 / Math.PI,
+            lat + dLat * 180 / Math.PI
+        ]);
+    }
+
+    return {
+        type: "Polygon",
+        coordinates: [coords]
+    };
 }
 
-// ===================================
-// ИНИЦИАЛИЗАЦИЯ СЛОЁВ
-// ===================================
 
-function initRadarLayer(map) {
+// =========================================
+// ПОСТРОЕНИЕ СЕКТОРА
+// =========================================
+
+function buildConePolygon(center, bearing, fov, radius) {
+    const [lon, lat] = center;
+
+    const R = 6378137;
+    const steps = 40;
+
+    const coords = [center];
+
+    const bearingRad = bearing * Math.PI / 180;
+    const halfFov = fov / 2 * Math.PI / 180;
+
+    for (let i = 0; i <= steps; i++) {
+        const angle = bearingRad - halfFov +
+            (i / steps) * (halfFov * 2);
+
+        const dx = radius * Math.sin(angle);
+        const dy = radius * Math.cos(angle);
+
+        const dLat = dy / R;
+        const dLon = dx / (R * Math.cos(lat * Math.PI / 180));
+
+        coords.push([
+            lon + dLon * 180 / Math.PI,
+            lat + dLat * 180 / Math.PI
+        ]);
+    }
+
+    coords.push(center);
+
+    return {
+        type: "Polygon",
+        coordinates: [coords]
+    };
+}
+
+
+// =========================================
+// ИНИЦИАЛИЗАЦИЯ РАДАРА
+// =========================================
+
+function initRadarLayer() {
+
     if (!map.isStyleLoaded()) return;
 
-    if (!map.getSource("userRadar")) {
-        map.addSource("userRadar", {
+    if (!map.getSource(RADAR_SOURCE)) {
+        map.addSource(RADAR_SOURCE, {
             type: "geojson",
             data: {
                 type: "FeatureCollection",
@@ -125,7 +148,7 @@ function initRadarLayer(map) {
         map.addLayer({
             id: "userRadarCircle",
             type: "fill",
-            source: "userRadar",
+            source: RADAR_SOURCE,
             filter: ["==", ["get", "shape"], "circle"],
             paint: {
                 "fill-color": "rgba(0,200,83,0.15)",
@@ -138,7 +161,7 @@ function initRadarLayer(map) {
         map.addLayer({
             id: "userRadarSector",
             type: "fill",
-            source: "userRadar",
+            source: RADAR_SOURCE,
             filter: ["==", ["get", "shape"], "sector"],
             paint: {
                 "fill-color": "rgba(0,200,83,0.35)",
@@ -147,40 +170,46 @@ function initRadarLayer(map) {
         });
     }
 
-    updateRadar(map);
+    updateRadar();
 }
 
 
-// ===================================
+// =========================================
 // ОБНОВЛЕНИЕ РАДАРА
-// ===================================
+// =========================================
 
-function updateRadar(map) {
-    if (!userCoords || !map.getSource("userRadar")) return;
+function updateRadar() {
 
-    const source = map.getSource("userRadar");
+    if (!map.getSource(RADAR_SOURCE)) return;
 
-    if (!following) {
+    const source = map.getSource(RADAR_SOURCE);
+
+    if (!following || !userCoords || !renderCoords) {
         source.setData({
             type: "FeatureCollection",
             features: []
         });
+
         return;
     }
 
-    const center = renderCoords || userCoords;
+    const center = renderCoords;
 
     source.setData({
         type: "FeatureCollection",
         features: [
             {
                 type: "Feature",
-                properties: { shape: "circle" },
+                properties: {
+                    shape: "circle"
+                },
                 geometry: buildCircle(center, DIST_METERS)
             },
             {
                 type: "Feature",
-                properties: { shape: "sector" },
+                properties: {
+                    shape: "sector"
+                },
                 geometry: buildConePolygon(
                     center,
                     userHeading,
@@ -193,94 +222,157 @@ function updateRadar(map) {
 }
 
 
+// =========================================
+// ПЛАВНОЕ ДВИЖЕНИЕ
+// =========================================
 
+function startMarkerAnimation() {
 
-// ===================================
-// ПЛАВНОЕ ДВИЖЕНИЕ МАРКЕРА
-// ===================================
+    if (animationRunning) return;
 
-// ===================================
-// ГЕОЛОКАЦИЯ
-// ===================================
-function startWatchingPosition(map) {
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
+    animationRunning = true;
 
-  if (watchId) return;
+    function loop() {
 
-  watchId = navigator.geolocation.watchPosition(
-    (pos) => {
-      userCoords = [
-        pos.coords.longitude,
-        pos.coords.latitude,
-      ];
-      window.userCoords = userCoords;
+        if (userMarker && renderCoords && targetCoords) {
 
-      if (!userMarker) {
-        userMarker = new maplibregl.Marker({
-          color: hexColors[4],
-          scale: 1,
-        })
-          .setLngLat(userCoords)
-          .addTo(map);
-          userMarker.getElement().style.position = "absolute";
-           // userMarker.getElement().style.zIndex = "1";
-      }
+            const dx = targetCoords[0] - renderCoords[0];
+            const dy = targetCoords[1] - renderCoords[1];
 
-      if (!renderCoords) {
-    renderCoords = [...userCoords];
-    targetCoords = [...userCoords];
-    userMarker.setLngLat(renderCoords);
-    startMarkerAnimation();
-} else {
+            renderCoords[0] += dx * SMOOTH;
+            renderCoords[1] += dy * SMOOTH;
 
-    if (distanceMeters(targetCoords, userCoords) >= MIN_MOVE) {
-        targetCoords = [...userCoords];
+            userMarker.setLngLat(renderCoords);
+
+            if (following) {
+                updateRadar();
+            }
+        }
+
+        requestAnimationFrame(loop);
     }
 
-}
-    
-    },
-    (err) => console.warn("⚠ Геолокация:", err),
-    { enableHighAccuracy: true }
-  );
+    requestAnimationFrame(loop);
 }
 
-// ===================================
-// ОРИЕНТАЦИЯ УСТРОЙСТВА
-// ===================================
 
-let orientationStarted = false;
+// =========================================
+// ГЕОЛОКАЦИЯ
+// =========================================
 
-async function initOrientation(map) {
+function startWatchingPosition() {
+
+    if (!navigator.geolocation) {
+        console.error("GPS не поддерживается");
+        return;
+    }
+
+    if (watchId !== null) return;
+
+    watchId = navigator.geolocation.watchPosition(
+
+        (pos) => {
+
+            userCoords = [
+                pos.coords.longitude,
+                pos.coords.latitude
+            ];
+
+            window.userCoords = userCoords;
+
+            if (!userMarker) {
+
+                userMarker = new maplibregl.Marker({
+                    color: typeof hexColors !== "undefined"
+                        ? hexColors[4]
+                        : "#00c853"
+                })
+                    .setLngLat(userCoords)
+                    .addTo(map);
+
+                renderCoords = [...userCoords];
+                targetCoords = [...userCoords];
+
+                startMarkerAnimation();
+
+            } else {
+
+                if (
+                    distanceMeters(targetCoords, userCoords) >= MIN_MOVE
+                ) {
+                    targetCoords = [...userCoords];
+                }
+            }
+
+            if (following) {
+                updateRadar();
+            }
+
+            console.log("GPS:", userCoords);
+        },
+
+        (err) => {
+            console.error(
+                "GPS ERROR:",
+                err.code,
+                err.message
+            );
+        },
+
+        {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 20000
+        }
+    );
+}
+
+
+// =========================================
+// КОМПАС
+// =========================================
+
+async function initOrientation() {
+
     if (orientationStarted) return;
 
     if (typeof DeviceOrientationEvent === "undefined") {
-        console.warn("Компас не поддерживается");
+        console.warn("DeviceOrientation API недоступен");
         return;
     }
 
     try {
+
+        // iOS Safari: разрешение после нажатия кнопки
+
         if (
             typeof DeviceOrientationEvent.requestPermission === "function"
         ) {
+
             const permission =
-                await DeviceOrientationEvent.requestPermission(true);
+                await DeviceOrientationEvent.requestPermission();
 
             if (permission !== "granted") {
-                console.warn("Нет разрешения на компас");
+                console.warn("Доступ к компасу запрещён");
                 return;
             }
         }
 
-        function handler(e) {
+        function handleOrientation(e) {
+
             let heading = null;
 
-            if (typeof e.webkitCompassHeading === "number") {
+            // iPhone Safari
+
+            if (
+                typeof e.webkitCompassHeading === "number"
+            ) {
                 heading = e.webkitCompassHeading;
-            } else if (
+            }
+
+            // Android: абсолютное направление
+
+            else if (
                 e.absolute === true &&
                 typeof e.alpha === "number"
             ) {
@@ -290,53 +382,108 @@ async function initOrientation(map) {
             if (heading === null) return;
 
             userHeading = (heading + 360) % 360;
-            updateRadar(map);
+            headingAvailable = true;
+
+            if (following) {
+                updateRadar();
+            }
         }
 
-        window.addEventListener("deviceorientation", handler, true);
-        window.addEventListener("deviceorientationabsolute", handler, true);
+        window.addEventListener(
+            "deviceorientation",
+            handleOrientation,
+            true
+        );
+
+        window.addEventListener(
+            "deviceorientationabsolute",
+            handleOrientation,
+            true
+        );
 
         orientationStarted = true;
 
-        console.log("Компас запущен");
+        console.log("Компас: обработчики подключены");
 
     } catch (error) {
+
         console.error("Ошибка компаса:", error);
+
     }
 }
 
 
-// ===================================
-// КНОПКИ
-// ===================================
-if (followBtn) {
-  followBtn.onclick = () => {
-    following = !following;
-    followBtn.style.backgroundColor = following
-      ? "#41644A"
-      : "transparent";
-    followBtn.style.color = "#fff";
+// =========================================
+// КНОПКА СЛЕЖЕНИЯ
+// =========================================
 
-    if (following) initOrientation(map);
-    updateRadar(map);
-  };
+if (followBtn) {
+
+    followBtn.onclick = async () => {
+
+        following = !following;
+
+        followBtn.style.backgroundColor = following
+            ? "#41644A"
+            : "transparent";
+
+        followBtn.style.color = "#fff";
+
+        if (following) {
+
+            await initOrientation();
+
+            if (userCoords) {
+                map.easeTo({
+                    center: userCoords,
+                    bearing: userHeading,
+                    duration: 500,
+                    essential: true
+                });
+            }
+
+        }
+
+        updateRadar();
+    };
 }
+
+
+// =========================================
+// КНОПКА ОБНОВЛЕНИЯ ПОЗИЦИИ
+// =========================================
 
 if (refreshBtn) {
-  refreshBtn.onclick = () => {
-    if (!userCoords) return;
-    map.flyTo({
-      center: userCoords,
-      zoom: 14,
-      essential: true,
-    });
-  };
+
+    refreshBtn.onclick = () => {
+
+        if (!userCoords) return;
+
+        map.flyTo({
+            center: userCoords,
+            zoom: 14,
+            essential: true
+        });
+    };
 }
 
-// ===================================
+
+// =========================================
 // ЗАПУСК
-// ===================================
+// =========================================
 
 map.on("style.load", () => {
-    initRadarLayer(map);
+
+    console.log("Map style loaded");
+
+    initRadarLayer();
+
+});
+
+map.on("load", () => {
+
+    startWatchingPosition();
+
+    initRadarLayer();
+
 });
