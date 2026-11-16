@@ -184,14 +184,10 @@ function updateRadar() {
 
     const source = map.getSource(RADAR_SOURCE);
 
-    if (!following || !userCoords || !renderCoords) {
-        source.setData({
-            type: "FeatureCollection",
-            features: []
-        });
-
-        return;
-    }
+if (!following || !userCoords || !renderCoords) {
+    source.setData({ type: "FeatureCollection", features: [] });
+    return;
+}
 
     const center = renderCoords;
 
