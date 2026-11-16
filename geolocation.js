@@ -361,7 +361,6 @@ if (refreshBtn) {
 // ЗАПУСК
 // ===================================
 
-map.on("load", () => {
-  initRadarLayer(map);
-  startWatchingPosition(map);
+map.on("style.load", () => {
+    initRadarLayer(map);
 });
