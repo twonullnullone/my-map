@@ -193,29 +193,7 @@ function updateRadar(map) {
 }
 
 
-  map.getSource("userRadar").setData({
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: { shape: "circle" },
-        geometry: circle,
-      },
-      {
-        type: "Feature",
-        properties: { shape: "sector" },
-        geometry: sector,
-      },
-    ],
-  });
 
-  map.easeTo({
-    center: userCoords,
-    bearing: userHeading,
-    duration: 500,
-    essential: true,
-  });
-}
 
 // ===================================
 // ПЛАВНОЕ ДВИЖЕНИЕ МАРКЕРА
