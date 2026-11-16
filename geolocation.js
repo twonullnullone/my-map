@@ -291,15 +291,13 @@ function updateRadar() {
 
     if (!source) return;
 
-    if (
-        !following ||
-        !validCoords(userCoords) ||
-        !validCoords(renderCoords)
-    ) {
-
-        source.setData(emptyRadarData());
-        return;
-    }
+  if (
+    !validCoords(userCoords) ||
+    !validCoords(renderCoords)
+) {
+    source.setData(emptyRadarData());
+    return;
+}
 
     const center = renderCoords;
 
@@ -441,7 +439,7 @@ function startWatchingPosition() {
                         typeof hexColors !== "undefined" &&
                         hexColors[4]
                             ? hexColors[4]
-                            : "#00c853"
+                            : "#000"
 
                 })
                 .setLngLat(coords)
@@ -575,7 +573,7 @@ async function initOrientation() {
 
 if (followBtn) {
 
-    followBtn.onclick = () => {
+    followBtn.onclick = async () => {
 
         following = !following;
 
@@ -586,21 +584,23 @@ if (followBtn) {
 
         if (following) {
 
-            initOrientation();
+            // Запускаем компас
+            await initOrientation();
 
+            // Центрируем карту
             if (validCoords(userCoords)) {
 
                 map.easeTo({
-
                     center: userCoords,
                     bearing: userHeading,
                     duration: 500,
                     essential: true
-
                 });
             }
+
         }
 
+        // Обновляем радар в обоих состояниях
         updateRadar();
 
         console.log("FOLLOWING:", following);
