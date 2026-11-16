@@ -291,14 +291,14 @@ function updateRadar() {
 
     if (!source) return;
 
-  if (
+if (
+    !following ||
     !validCoords(userCoords) ||
     !validCoords(renderCoords)
 ) {
     source.setData(emptyRadarData());
     return;
 }
-
     const center = renderCoords;
 
     const circle = buildCircle(
@@ -584,8 +584,11 @@ if (followBtn) {
 
         if (following) {
 
-            // Запускаем компас
-            await initOrientation();
+            // Включаем компас
+            initOrientation();
+
+            // Запускаем GPS
+            startWatchingPosition();
 
             // Центрируем карту
             if (validCoords(userCoords)) {
@@ -598,10 +601,20 @@ if (followBtn) {
                 });
             }
 
-        }
+            // Показываем радар
+            updateRadar();
 
-        // Обновляем радар в обоих состояниях
-        updateRadar();
+        } else {
+
+            // Полностью очищаем радар
+            const source = map.getSource(RADAR_SOURCE);
+
+            if (source) {
+                source.setData(emptyRadarData());
+            }
+
+            console.log("RADAR DISABLED");
+        }
 
         console.log("FOLLOWING:", following);
     };
