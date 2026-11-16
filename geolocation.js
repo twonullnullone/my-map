@@ -647,25 +647,66 @@ map.on("style.load", () => {
 
 // GPS запускаем один раз после загрузки карты
 
+
+let radarInitScheduled = false;
+
+function scheduleRadarInit() {
+
+    if (radarInitScheduled) return;
+
+    radarInitScheduled = true;
+
+    function checkStyle() {
+
+        if (!map.isStyleLoaded()) {
+            requestAnimationFrame(checkStyle);
+            return;
+        }
+
+        radarInitScheduled = false;
+
+        console.log("RADAR: стиль готов");
+
+        initRadarLayer();
+    }
+
+    requestAnimationFrame(checkStyle);
+}
+
+
+// Смена или загрузка стиля
+map.on("style.load", () => {
+
+    console.log("MAP STYLE LOADED");
+
+    radarReady = false;
+
+    scheduleRadarInit();
+
+});
+
+
+// Первоначальная загрузка карты
 map.on("load", () => {
 
     console.log("MAP LOADED");
 
     startWatchingPosition();
 
+    scheduleRadarInit();
+
 });
 
-// Если скрипт подключился уже после загрузки карты
 
+// Если скрипт подключился после загрузки
 if (map.loaded()) {
-
     startWatchingPosition();
 }
 
 if (map.isStyleLoaded()) {
-
-    initRadarLayer();
+    scheduleRadarInit();
 }
+
 
 
 // =========================================
