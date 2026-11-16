@@ -131,8 +131,10 @@ function buildConePolygon(center, bearing, fov, radius) {
 // =========================================
 
 function initRadarLayer() {
-
-    if (!map.isStyleLoaded()) return;
+    if (!map.isStyleLoaded()) {
+        console.warn("Стиль карты ещё загружается");
+        return;
+    }
 
     if (!map.getSource(RADAR_SOURCE)) {
         map.addSource(RADAR_SOURCE, {
@@ -151,8 +153,9 @@ function initRadarLayer() {
             source: RADAR_SOURCE,
             filter: ["==", ["get", "shape"], "circle"],
             paint: {
-                "fill-color": "rgba(0,200,83,0.15)",
-                "fill-outline-color": "rgba(0,200,83,0.4)"
+                "fill-color": "#00c853",
+                "fill-opacity": 0.15,
+                "fill-outline-color": "#00c853"
             }
         });
     }
@@ -164,11 +167,14 @@ function initRadarLayer() {
             source: RADAR_SOURCE,
             filter: ["==", ["get", "shape"], "sector"],
             paint: {
-                "fill-color": "rgba(0,200,83,0.35)",
-                "fill-outline-color": "rgba(0,200,83,0.8)"
+                "fill-color": "#00c853",
+                "fill-opacity": 0.35,
+                "fill-outline-color": "#00c853"
             }
         });
     }
+
+    console.log("RADAR INITIALIZED");
 
     updateRadar();
 }
@@ -180,16 +186,31 @@ function initRadarLayer() {
 
 function updateRadar() {
 
-    if (!map.getSource(RADAR_SOURCE)) return;
-
     const source = map.getSource(RADAR_SOURCE);
 
-if (!following || !userCoords || !renderCoords) {
-    source.setData({ type: "FeatureCollection", features: [] });
-    return;
-}
+    if (!source) return;
+
+    if (!following || !userCoords || !renderCoords) {
+        source.setData({
+            type: "FeatureCollection",
+            features: []
+        });
+        return;
+    }
 
     const center = renderCoords;
+
+    const circle = buildCircle(
+        center,
+        DIST_METERS
+    );
+
+    const sector = buildConePolygon(
+        center,
+        userHeading,
+        FOV_DEG,
+        DIST_METERS
+    );
 
     source.setData({
         type: "FeatureCollection",
@@ -199,19 +220,14 @@ if (!following || !userCoords || !renderCoords) {
                 properties: {
                     shape: "circle"
                 },
-                geometry: buildCircle(center, DIST_METERS)
+                geometry: circle
             },
             {
                 type: "Feature",
                 properties: {
                     shape: "sector"
                 },
-                geometry: buildConePolygon(
-                    center,
-                    userHeading,
-                    FOV_DEG,
-                    DIST_METERS
-                )
+                geometry: sector
             }
         ]
     });
@@ -250,8 +266,6 @@ function startMarkerAnimation() {
 
     requestAnimationFrame(loop);
 }
-
-
 // =========================================
 // ГЕОЛОКАЦИЯ
 // =========================================
@@ -276,6 +290,16 @@ function startWatchingPosition() {
 
             window.userCoords = userCoords;
 
+            // Всегда инициализируем координаты
+            if (!renderCoords) {
+                renderCoords = [...userCoords];
+            }
+
+            if (!targetCoords) {
+                targetCoords = [...userCoords];
+            }
+
+            // Создаём маркер
             if (!userMarker) {
 
                 userMarker = new maplibregl.Marker({
@@ -283,28 +307,29 @@ function startWatchingPosition() {
                         ? hexColors[4]
                         : "#00c853"
                 })
-                    .setLngLat(userCoords)
-                    .addTo(map);
-
-                renderCoords = [...userCoords];
-                targetCoords = [...userCoords];
-
-                startMarkerAnimation();
-
-            } else {
-
-                if (
-                    distanceMeters(targetCoords, userCoords) >= MIN_MOVE
-                ) {
-                    targetCoords = [...userCoords];
-                }
+                .setLngLat(userCoords)
+                .addTo(map);
             }
 
+            // Обновляем целевую позицию
+            if (
+                distanceMeters(targetCoords, userCoords) >= MIN_MOVE
+            ) {
+                targetCoords = [...userCoords];
+            }
+
+            // Запускаем анимацию
+            if (!animationRunning) {
+                startMarkerAnimation();
+            }
+
+            // Обновляем радар
             if (following) {
                 updateRadar();
             }
 
             console.log("GPS:", userCoords);
+
         },
 
         (err) => {
@@ -333,13 +358,11 @@ async function initOrientation() {
     if (orientationStarted) return;
 
     if (typeof DeviceOrientationEvent === "undefined") {
-        console.warn("DeviceOrientation API недоступен");
+        console.warn("Компас недоступен");
         return;
     }
 
     try {
-
-        // iOS Safari: разрешение после нажатия кнопки
 
         if (
             typeof DeviceOrientationEvent.requestPermission === "function"
@@ -358,15 +381,11 @@ async function initOrientation() {
 
             let heading = null;
 
-            // iPhone Safari
-
             if (
                 typeof e.webkitCompassHeading === "number"
             ) {
                 heading = e.webkitCompassHeading;
             }
-
-            // Android: абсолютное направление
 
             else if (
                 e.absolute === true &&
@@ -399,7 +418,7 @@ async function initOrientation() {
 
         orientationStarted = true;
 
-        console.log("Компас: обработчики подключены");
+        console.log("COMPASS INITIALIZED");
 
     } catch (error) {
 
@@ -414,39 +433,38 @@ async function initOrientation() {
 // =========================================
 
 if (followBtn) {
+
     followBtn.onclick = () => {
-        // Синхронный запрос разрешения для iOS Safari ПЕРЕД изменениями состояний
-        if (typeof DeviceOrientationEvent !== "undefined" && 
-            typeof DeviceOrientationEvent.requestPermission === "function") {
-            DeviceOrientationEvent.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    initOrientation();
-                } else {
-                    console.warn("Доступ к компасу запрещён пользователем");
-                }
-            }).catch(console.error);
-        } else {
-            initOrientation();
-        }
 
         following = !following;
 
-        followBtn.style.backgroundColor = following ? "#41644A" : "transparent";
+        followBtn.style.backgroundColor =
+            following ? "#41644A" : "transparent";
+
         followBtn.style.color = "#fff";
 
-        if (following && userCoords) {
-            map.easeTo({
-                center: userCoords,
-                bearing: userHeading,
-                duration: 500,
-                essential: true
-            });
+        if (following) {
+
+            // Запрашиваем компас один раз
+            initOrientation();
+
+            // Перемещаем карту к пользователю
+            if (userCoords) {
+
+                map.easeTo({
+                    center: userCoords,
+                    bearing: userHeading,
+                    duration: 500,
+                    essential: true
+                });
+            }
         }
 
         updateRadar();
+
+        console.log("FOLLOWING:", following);
     };
 }
-
 
 // =========================================
 // КНОПКА ОБНОВЛЕНИЯ ПОЗИЦИИ
@@ -473,7 +491,7 @@ if (refreshBtn) {
 
 map.on("style.load", () => {
 
-    console.log("Map style loaded");
+    console.log("MAP STYLE LOADED");
 
     initRadarLayer();
 
@@ -481,8 +499,10 @@ map.on("style.load", () => {
 
 map.on("load", () => {
 
-    startWatchingPosition();
+    console.log("MAP LOADED");
 
     initRadarLayer();
+
+    startWatchingPosition();
 
 });
