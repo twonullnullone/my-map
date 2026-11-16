@@ -183,19 +183,16 @@ function initRadarLayer() {
 // =========================================
 
 function updateRadar() {
-
     if (!map.getSource(RADAR_SOURCE)) return;
 
     const source = map.getSource(RADAR_SOURCE);
 
-    // Убираем жесткую зависимость от !following, чтобы радар рисовался по GPS
     if (!userCoords || !renderCoords) {
         source.setData({ type: "FeatureCollection", features: [] });
         return;
     }
 
     const center = renderCoords;
-    // Если компас еще не дал данные, используем 0 (север), чтобы сектор не пропадал
     const currentHeading = headingAvailable ? userHeading : 0;
 
     source.setData({
@@ -203,27 +200,17 @@ function updateRadar() {
         features: [
             {
                 type: "Feature",
-                properties: {
-                    shape: "circle"
-                },
+                properties: { shape: "circle" },
                 geometry: buildCircle(center, DIST_METERS)
             },
             {
                 type: "Feature",
-                properties: {
-                    shape: "sector"
-                },
-                geometry: buildConePolygon(
-                    center,
-                    currentHeading,
-                    FOV_DEG,
-                    DIST_METERS
-                )
+                properties: { shape: "sector" },
+                geometry: buildConePolygon(center, currentHeading, FOV_DEG, DIST_METERS)
             }
         ]
     });
 }
-
 
 // =========================================
 // ПЛАВНОЕ ДВИЖЕНИЕ
