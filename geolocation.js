@@ -275,45 +275,60 @@ function startWatchingPosition(map) {
 // ===================================
 // ОРИЕНТАЦИЯ УСТРОЙСТВА
 // ===================================
-function initOrientation(map) {
-  function handler(e) {
-    let heading = null;
 
-    if (e.webkitCompassHeading !== undefined) {
-      heading = e.webkitCompassHeading;
-    } else if (e.alpha !== null) {
-      heading = 360 - e.alpha;
+let orientationStarted = false;
+
+async function initOrientation(map) {
+    if (orientationStarted) return;
+
+    if (typeof DeviceOrientationEvent === "undefined") {
+        console.warn("Компас не поддерживается");
+        return;
     }
 
-    if (heading !== null) {
-      userHeading = heading;
-      updateRadar(map);
-    }
-  }
+    try {
+        if (
+            typeof DeviceOrientationEvent.requestPermission === "function"
+        ) {
+            const permission =
+                await DeviceOrientationEvent.requestPermission(true);
 
-  if (DeviceOrientationEvent?.requestPermission) {
-    DeviceOrientationEvent.requestPermission().then((r) => {
-      if (r === "granted") {
-        window.addEventListener(
-          "deviceorientation",
-          handler,
-          true
-        );
-      }
-    });
-  } else {
-    window.addEventListener(
-      "deviceorientationabsolute",
-      handler,
-      true
-    );
-    window.addEventListener(
-      "deviceorientation",
-      handler,
-      true
-    );
-  }
+            if (permission !== "granted") {
+                console.warn("Нет разрешения на компас");
+                return;
+            }
+        }
+
+        function handler(e) {
+            let heading = null;
+
+            if (typeof e.webkitCompassHeading === "number") {
+                heading = e.webkitCompassHeading;
+            } else if (
+                e.absolute === true &&
+                typeof e.alpha === "number"
+            ) {
+                heading = 360 - e.alpha;
+            }
+
+            if (heading === null) return;
+
+            userHeading = (heading + 360) % 360;
+            updateRadar(map);
+        }
+
+        window.addEventListener("deviceorientation", handler, true);
+        window.addEventListener("deviceorientationabsolute", handler, true);
+
+        orientationStarted = true;
+
+        console.log("Компас запущен");
+
+    } catch (error) {
+        console.error("Ошибка компаса:", error);
+    }
 }
+
 
 // ===================================
 // КНОПКИ
