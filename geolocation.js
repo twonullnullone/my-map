@@ -27,7 +27,7 @@ function distanceMeters(a, b) {
 
 
 let following = false;
-//let userMarker = null;
+let userMarker = null;
 let userCoords = null;
 let prevCoords = null;
 let userHeading = 0;
