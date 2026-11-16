@@ -178,18 +178,25 @@ function initRadarLayer() {
 // ОБНОВЛЕНИЕ РАДАРА
 // =========================================
 
+// =========================================
+// ОБНОВЛЕНИЕ РАДАРА
+// =========================================
+
 function updateRadar() {
 
     if (!map.getSource(RADAR_SOURCE)) return;
 
     const source = map.getSource(RADAR_SOURCE);
 
-if (!following || !userCoords || !renderCoords) {
-    source.setData({ type: "FeatureCollection", features: [] });
-    return;
-}
+    // Убираем жесткую зависимость от !following, чтобы радар рисовался по GPS
+    if (!userCoords || !renderCoords) {
+        source.setData({ type: "FeatureCollection", features: [] });
+        return;
+    }
 
     const center = renderCoords;
+    // Если компас еще не дал данные, используем 0 (север), чтобы сектор не пропадал
+    const currentHeading = headingAvailable ? userHeading : 0;
 
     source.setData({
         type: "FeatureCollection",
@@ -208,7 +215,7 @@ if (!following || !userCoords || !renderCoords) {
                 },
                 geometry: buildConePolygon(
                     center,
-                    userHeading,
+                    currentHeading,
                     FOV_DEG,
                     DIST_METERS
                 )
