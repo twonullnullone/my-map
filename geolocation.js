@@ -18,7 +18,7 @@ const RADAR_SOURCE = "userRadar";
 
 let following = false;
 
-//let userMarker = null;
+let userMarker = null;
 let userCoords = null;
 let targetCoords = null;
 let renderCoords = null;
