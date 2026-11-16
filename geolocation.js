@@ -183,32 +183,40 @@ function initRadarLayer() {
 // =========================================
 
 function updateRadar() {
-    if (!map.getSource(RADAR_SOURCE)) return;
-
     const source = map.getSource(RADAR_SOURCE);
+    if (!source) return;
 
     if (!userCoords || !renderCoords) {
-        source.setData({ type: "FeatureCollection", features: [] });
+        source.setData({
+            type: "FeatureCollection",
+            features: []
+        });
         return;
     }
 
     const center = renderCoords;
-    const currentHeading = headingAvailable ? userHeading : 0;
+
+    const features = [
+        {
+            type: "Feature",
+            properties: { shape: "circle" },
+            geometry: buildCircle(center, DIST_METERS)
+        },
+        {
+            type: "Feature",
+            properties: { shape: "sector" },
+            geometry: buildConePolygon(
+                center,
+                headingAvailable ? userHeading : 0,
+                FOV_DEG,
+                DIST_METERS
+            )
+        }
+    ];
 
     source.setData({
         type: "FeatureCollection",
-        features: [
-            {
-                type: "Feature",
-                properties: { shape: "circle" },
-                geometry: buildCircle(center, DIST_METERS)
-            },
-            {
-                type: "Feature",
-                properties: { shape: "sector" },
-                geometry: buildConePolygon(center, currentHeading, FOV_DEG, DIST_METERS)
-            }
-        ]
+        features
     });
 }
 
@@ -263,29 +271,33 @@ function startWatchingPosition() {
 
             window.userCoords = userCoords;
 
-            if (!userMarker) {
+        if (!userMarker) {
+    userMarker = new maplibregl.Marker({
+        color: "#00c853"
+    })
+    .setLngLat(userCoords)
+    .addTo(map);
+}
 
-                userMarker = new maplibregl.Marker({
-                    color: typeof hexColors !== "undefined"
-                        ? hexColors[4]
-                        : "#00c853"
-                })
-                    .setLngLat(userCoords)
-                    .addTo(map);
+// Важно: координаты инициализируются независимо от маркера
+if (!renderCoords) {
+    renderCoords = [...userCoords];
+}
 
-                renderCoords = [...userCoords];
-                targetCoords = [...userCoords];
+if (!targetCoords) {
+    targetCoords = [...userCoords];
+}
 
-                startMarkerAnimation();
+if (!animationRunning) {
+    startMarkerAnimation();
+}
 
-            } else {
+if (distanceMeters(targetCoords, userCoords) >= MIN_MOVE) {
+    targetCoords = [...userCoords];
+}
 
-                if (
-                    distanceMeters(targetCoords, userCoords) >= MIN_MOVE
-                ) {
-                    targetCoords = [...userCoords];
-                }
-            }
+// Обновляем радар при каждом GPS-обновлении
+updateRadar();
 
             if (following) {
                 updateRadar();
