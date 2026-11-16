@@ -20,7 +20,6 @@ const RADAR_SECTOR = "userRadarSector";
 
 let following = false;
 
-let userMarker = null;
 let userCoords = null;
 let targetCoords = null;
 let renderCoords = null;
