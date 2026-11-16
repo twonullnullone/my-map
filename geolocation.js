@@ -725,7 +725,7 @@ if (map.isStyleLoaded()) {
 // =========================================
 // DEBUG PANEL
 // =========================================
-
+/*
 const debugPanel = document.createElement("div");
 
 debugPanel.id = "radarDebugPanel";
@@ -780,7 +780,7 @@ function updateRadarDebug() {
         .map(([key, value]) => `${key}: ${value}`)
 
         .join("\n");
-}
+}*/
 
 //setInterval(updateRadarDebug, 1000);
 
