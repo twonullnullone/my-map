@@ -418,30 +418,33 @@ async function initOrientation() {
 // =========================================
 
 if (followBtn) {
-
-    followBtn.onclick = async () => {
+    followBtn.onclick = () => {
+        // Синхронный запрос разрешения для iOS Safari ПЕРЕД изменениями состояний
+        if (typeof DeviceOrientationEvent !== "undefined" && 
+            typeof DeviceOrientationEvent.requestPermission === "function") {
+            DeviceOrientationEvent.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    initOrientation();
+                } else {
+                    console.warn("Доступ к компасу запрещён пользователем");
+                }
+            }).catch(console.error);
+        } else {
+            initOrientation();
+        }
 
         following = !following;
 
-        followBtn.style.backgroundColor = following
-            ? "#41644A"
-            : "transparent";
-
+        followBtn.style.backgroundColor = following ? "#41644A" : "transparent";
         followBtn.style.color = "#fff";
 
-        if (following) {
-
-            await initOrientation();
-
-            if (userCoords) {
-                map.easeTo({
-                    center: userCoords,
-                    bearing: userHeading,
-                    duration: 500,
-                    essential: true
-                });
-            }
-
+        if (following && userCoords) {
+            map.easeTo({
+                center: userCoords,
+                bearing: userHeading,
+                duration: 500,
+                essential: true
+            });
         }
 
         updateRadar();
