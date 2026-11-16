@@ -198,30 +198,6 @@ function updateRadar(map) {
 // ===================================
 // ПЛАВНОЕ ДВИЖЕНИЕ МАРКЕРА
 // ===================================
-function startMarkerAnimation() {
-
-    if (animationRunning) return;
-    animationRunning = true;
-
-    function loop() {
-
-        if (userMarker && renderCoords && targetCoords) {
-
-            const dx = targetCoords[0] - renderCoords[0];
-            const dy = targetCoords[1] - renderCoords[1];
-
-            renderCoords[0] += dx * SMOOTH;
-            renderCoords[1] += dy * SMOOTH;
-
-            userMarker.setLngLat(renderCoords);
-            updateRadar(map);
-        }
-
-        requestAnimationFrame(loop);
-    }
-
-    loop();
-}
 
 // ===================================
 // ГЕОЛОКАЦИЯ
