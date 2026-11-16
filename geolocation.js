@@ -130,53 +130,122 @@ function buildConePolygon(center, bearing, fov, radius) {
 // ИНИЦИАЛИЗАЦИЯ РАДАРА
 // =========================================
 
+// =====================================
+// ИНИЦИАЛИЗАЦИЯ РАДАРА
+// =====================================
+
+let radarInitWaiting = false;
+
 function initRadarLayer() {
-    if (!map.isStyleLoaded()) {
-        console.warn("Стиль карты ещё загружается");
+
+    if (!map || !map.getStyle()) {
+        console.log("RADAR: карта ещё не готова");
         return;
     }
 
-    if (!map.getSource(RADAR_SOURCE)) {
-        map.addSource(RADAR_SOURCE, {
+    // Ждём полной готовности стиля
+    if (!map.isStyleLoaded()) {
+
+        if (!radarInitWaiting) {
+            radarInitWaiting = true;
+
+            console.log("RADAR: ожидаем загрузку стиля");
+
+            map.once("idle", () => {
+                radarInitWaiting = false;
+                initRadarLayer();
+            });
+        }
+
+        return;
+    }
+
+    console.log("RADAR: инициализация");
+
+    // ---------------------------------
+    // 1. GEOJSON SOURCE
+    // ---------------------------------
+
+    if (!map.getSource("userRadar")) {
+
+        map.addSource("userRadar", {
             type: "geojson",
             data: {
                 type: "FeatureCollection",
                 features: []
             }
         });
+
+        console.log("RADAR: SOURCE CREATED");
     }
 
+    // ---------------------------------
+    // 2. КРУГ РАДАРА
+    // ---------------------------------
+
     if (!map.getLayer("userRadarCircle")) {
+
         map.addLayer({
             id: "userRadarCircle",
             type: "fill",
-            source: RADAR_SOURCE,
-            filter: ["==", ["get", "shape"], "circle"],
+            source: "userRadar",
+
+            filter: [
+                "==",
+                ["get", "type"],
+                "circle"
+            ],
+
             paint: {
-                "fill-color": "#00c853",
-                "fill-opacity": 0.15,
-                "fill-outline-color": "#00c853"
+                "fill-color": "#36A2FF",
+                "fill-opacity": 0.12,
+                "fill-outline-color": "#36A2FF"
             }
         });
+
+        console.log("RADAR: CIRCLE CREATED");
     }
 
+    // ---------------------------------
+    // 3. СЕКТОР НАПРАВЛЕНИЯ
+    // ---------------------------------
+
     if (!map.getLayer("userRadarSector")) {
+
         map.addLayer({
             id: "userRadarSector",
             type: "fill",
-            source: RADAR_SOURCE,
-            filter: ["==", ["get", "shape"], "sector"],
+            source: "userRadar",
+
+            filter: [
+                "==",
+                ["get", "type"],
+                "sector"
+            ],
+
             paint: {
-                "fill-color": "#00c853",
-                "fill-opacity": 0.35,
-                "fill-outline-color": "#00c853"
+                "fill-color": "#36A2FF",
+                "fill-opacity": 0.28,
+                "fill-outline-color": "#36A2FF"
             }
         });
+
+        console.log("RADAR: SECTOR CREATED");
     }
 
-    console.log("RADAR INITIALIZED");
+    // ---------------------------------
+    // 4. ОБНОВЛЕНИЕ
+    // ---------------------------------
 
-    updateRadar();
+    console.log("RADAR INITIALIZED", {
+        source: !!map.getSource("userRadar"),
+        circle: !!map.getLayer("userRadarCircle"),
+        sector: !!map.getLayer("userRadarSector")
+    });
+
+    if (typeof updateRadar === "function") {
+        updateRadar();
+    }
 }
 
 if (userCoords && renderCoords) {
