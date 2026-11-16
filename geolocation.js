@@ -179,7 +179,9 @@ function initRadarLayer() {
     updateRadar();
 }
 
-
+if (userCoords && renderCoords) {
+    updateRadar();
+}
 // =========================================
 // ОБНОВЛЕНИЕ РАДАРА
 // =========================================
