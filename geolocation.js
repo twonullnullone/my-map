@@ -217,15 +217,11 @@ function updateRadar() {
 // =========================================
 
 function startMarkerAnimation() {
-
     if (animationRunning) return;
-
     animationRunning = true;
 
     function loop() {
-
         if (userMarker && renderCoords && targetCoords) {
-
             const dx = targetCoords[0] - renderCoords[0];
             const dy = targetCoords[1] - renderCoords[1];
 
@@ -234,14 +230,11 @@ function startMarkerAnimation() {
 
             userMarker.setLngLat(renderCoords);
 
-            if (following) {
-                updateRadar();
-            }
+            // Радар обновляем всегда (не только при following)
+            updateRadar();
         }
-
         requestAnimationFrame(loop);
     }
-
     requestAnimationFrame(loop);
 }
 
