@@ -15,7 +15,7 @@ const hexColors = [
   "#aeddbd", // 1 трава
   "#fff", // 2 здания
   "#000", // 3 маркеры points
-  "#eee", // 4 ползователская локация
+  "#000", // 4 ползователская локация
   "#eeeeec", // 5 цвет текста дорог
   "#eeeeec", // 6 цвет текста дорог обводка
   "#526972", // 7 дороги
@@ -448,7 +448,7 @@ const themePaths = {
     white: "mapstyle/test10.json",
     dark: "mapstyle/top1.json",
     light: "mapstyle/light.json",
-    gray: "mapstyle/gray.json",
+    gray: "mapstyle/pattern.json",
     night: "mapstyle/night.json",
     pastel: "mapstyle/pastel.json",
     retro: "mapstyle/retro.json",
