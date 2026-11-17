@@ -11,7 +11,7 @@ let userMarker = null;
 let userLocation = [69.629393, 42.348473];
 let routeLayerId = null;
 const hexColors = [
-  "#708993", // 0 локация
+  "#fff", // 0 локация
   "#aeddbd", // 1 трава
   "#fff", // 2 здания
   "#091921", // 3 маркеры points
@@ -39,19 +39,23 @@ function loadPointsAsync() {
 }*/
 
 async function loadPointsAsync() {
-  try {
-    const response = await fetch("coords.json");
+    try {
+        const url = `coords.json?v=${Date.now()}`;
 
-    if (!response.ok) {
-      throw new Error("Failed to load coords.json");
+        const response = await fetch(url, {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        return await response.json();
+
+    } catch (err) {
+        console.error("Ошибка загрузки координат:", err);
+        throw err;
     }
-
-    const points = await response.json();
-    return points;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
 }
 /* Loading points.js*/
 
