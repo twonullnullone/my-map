@@ -1,0 +1,14 @@
+
+{
+  "ofm": {
+    "width": 64,
+    "height": 64,
+    "x": 0,
+    "y": 0,
+    "pixelRatio": 1,
+    "stretchX": [[8, 56]],
+    "stretchY": [[8, 56]],
+    "content": [4, 4, 60, 60],
+    "sdf": false
+  }
+}
