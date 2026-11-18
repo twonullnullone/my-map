@@ -1,7 +1,6 @@
 
 
 
-
 #bottomBar {
     position: fixed;
     left: 50%;
@@ -18,17 +17,17 @@
 
     padding: 3px 7px;
 
-    background: rgba(255,255,255,.80);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 
     border: unset;
-    border-radius: 25px;
+    border-radius: 50px;
 
     box-shadow:
-        0 8px 25px rgba(0,0,0,.25),
-        inset 0 1px 2px rgba(255,255,255,.60),
-        inset 0 -1px 3px rgba(255,255,255,.25);
+        0 8px 25px rgba(0,0,0,.12),
+        inset 0 1px 2px rgba(255,255,255,.18),
+        inset 0 -1px 3px rgba(255,255,255,.05);
 
     z-index: 2000;
     isolation: isolate;
@@ -39,26 +38,26 @@
 #bottomBar::before {
     content: "";
     position: absolute;
-    inset: -35px;
+    inset: -45px;
     z-index: -1;
     pointer-events: none;
 
     background:
         radial-gradient(
             ellipse at 15% 20%,
-            rgba(255, 0, 70, .85),
-            transparent 90%
+            rgba(255,0,70,.95),
+            transparent 55%
         ),
         radial-gradient(
             ellipse at 85% 75%,
-            rgba(0, 220, 255, .75),
-            transparent 95%
+            rgba(0,220,255,.85),
+            transparent 55%
         );
 
-    filter: blur(28px);
+    filter: blur(35px);
 }
 
-/* White glass reflections */
+/* White glass reflection */
 #bottomBar::after {
     content: "";
     position: absolute;
@@ -69,22 +68,25 @@
 
     background: linear-gradient(
         135deg,
-        rgba(255,255,255,.18),
+        rgba(255,255,255,.12),
         transparent 35%,
         transparent 70%,
-        rgba(255,255,255,.80)
+        rgba(255,255,255,.07)
     );
 
     box-shadow:
-        inset 0 0 12px rgba(255,255,255,.13),
-        inset 0 1px 2px rgba(255,255,255,.3);
+        inset 0 0 10px rgba(255,255,255,.08),
+        inset 0 1px 2px rgba(255,255,255,.2);
 }
 
-/* Keep bar content above effects */
+/* Content */
 #bottomBar > * {
     position: relative;
     z-index: 3;
 }
+
+
+
 
 
 /*#bottomBar {
