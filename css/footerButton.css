@@ -68,10 +68,10 @@
 
     background: linear-gradient(
         135deg,
-        rgba(255,255,255,.12),
+        rgba(255,255,255,.88),
         transparent 35%,
         transparent 70%,
-        rgba(255,255,255,.07)
+        rgba(255,255,255,.78)
     );
 
     box-shadow:
