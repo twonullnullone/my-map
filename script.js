@@ -441,21 +441,21 @@ const themeOverlay = document.getElementById("sergek-theme-overlay");
 const THEME_STORAGE_KEY = "sergekMapTheme";
 
 const themePaths = {
-    default: "mapstyle/black.json",
-    black3: "mapstyle/black3.json",
-    blue: "mapstyle/blue.json",
-    green: "mapstyle/black3.json",
-    white: "mapstyle/test10.json",
-    dark: "mapstyle/top1.json",
-    light: "mapstyle/light.json",
-    gray: "mapstyle/pattern.json",
-    night: "mapstyle/night.json",
-    pastel: "mapstyle/pastel.json",
-    retro: "mapstyle/retro.json",
-    terrain: "mapstyle/terrain.json",
-    satellite: "mapstyle/satellite.json",
-    minimal: "mapstyle/minimal.json",
-    contrast: "mapstyle/contrast.json"
+    default: "mapstyle/test10.json",
+    black3: "mapstyle/light.json",
+    blue: "mapstyle/top1.json",
+    green: "mapstyle/ususy.json",
+    white: "mapstyle/heudhsu.json",
+    dark: "mapstyle/heuehd.json",
+    light: "mapstyle/hehehd.json",
+    gray: "mapstyle/hehdhd.json",
+    night: "mapstyle/hdhdhd.json",
+    pastel: "mapstyle/heudhdj.json",
+    retro: "mapstyle/hdhdhd.json",
+    terrain: "mapstyle/hdhd.json",
+    satellite: "mapstyle/duhdud.json",
+    minimal: "mapstyle/duudud.json",
+    contrast: "mapstyle/usudud.json"
 };
 
 // Получение сохранённой темы
