@@ -22,7 +22,7 @@
     -webkit-backdrop-filter: blur(20px);
 
     border: unset;
-    border-radius: 50px;
+    border-radius: 22px;
 
     box-shadow:
         0 8px 25px rgba(0,0,0,.12),
@@ -38,23 +38,23 @@
 #bottomBar::before {
     content: "";
     position: absolute;
-    inset: -45px;
+    inset: -35px;
     z-index: -1;
     pointer-events: none;
 
     background:
         radial-gradient(
             ellipse at 15% 20%,
-            rgba(255,0,70,.95),
+            rgba(255, 0, 70, .5),
             transparent 55%
         ),
         radial-gradient(
             ellipse at 85% 75%,
-            rgba(0,220,255,.85),
+            rgba(0, 220, 255, .8),
             transparent 55%
         );
 
-    filter: blur(35px);
+    filter: blur(28px);
 }
 
 /* White glass reflection */
