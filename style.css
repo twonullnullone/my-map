@@ -612,13 +612,13 @@ body::after {
 .maplibregl-ctrl-top-right,
 .maplibregl-ctrl-bottom-left,
 .maplibregl-ctrl-bottom-right {
-  z-index: 10 !important; /* или 20–100, если нужно выше */
+  z-index: 3000 !important; /* или 20–100, если нужно выше */
 }
 
 /* Если кнопки свои (кастомный HTML поверх карты) */
 .my-map-buttons {
   position: absolute;
-  z-index: 100;          /* выше, чем у контролов MapLibre */
+  z-index: 3000;          /* выше, чем у контролов MapLibre */
   pointer-events: auto;
   /* bottom, left/right, padding и т.д. по вкусу */
 }
