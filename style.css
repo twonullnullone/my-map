@@ -608,20 +608,65 @@ body::after {
 }
 */
 /* Для стандартных контролов MapLibre (zoom, compass, attribution и т.д.) */
+
+
+/* Контейнеры контролов */
 .maplibregl-ctrl-top-left,
 .maplibregl-ctrl-top-right,
 .maplibregl-ctrl-bottom-left,
 .maplibregl-ctrl-bottom-right {
-  z-index: 3000 !important; /* или 20–100, если нужно выше */
+    z-index: 1000 !important;
 }
 
-/* Если кнопки свои (кастомный HTML поверх карты) */
+/* Общий стиль контролов */
+.maplibregl-ctrl {
+    background: #222831 !important;
+    color: #ffffff !important;
+    border: 1px solid #454d59 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.3) !important;
+    overflow: hidden;
+}
+
+/* Кнопки Zoom, Compass */
+.maplibregl-ctrl button {
+    background-color: #222831 !important;
+    border: none !important;
+    width: 38px !important;
+    height: 38px !important;
+    cursor: pointer;
+}
+
+/* При наведении */
+.maplibregl-ctrl button:hover {
+    background-color: #3b4655 !important;
+}
+
+/* Иконки контролов */
+.maplibregl-ctrl button .maplibregl-ctrl-icon {
+    filter: brightness(0) invert(1);
+}
+
+/* Разделители */
+.maplibregl-ctrl-group button + button {
+    border-top: 1px solid #454d59 !important;
+}
+
+/* Attribution */
+.maplibregl-ctrl-attrib {
+    background: rgba(34,40,49,0.9) !important;
+    color: #ffffff !important;
+}
+
+.maplibregl-ctrl-attrib a {
+    color: #72b7ff !important;
+}
+
+/* Кнопки поверх карты */
 .my-map-buttons {
-  position: absolute;
-  z-index: 3000;          /* выше, чем у контролов MapLibre */
-  pointer-events: auto;
-  /* bottom, left/right, padding и т.д. по вкусу */
+    position: absolute;
+    z-index: 2000 !important;
+    pointer-events: auto;
 }
-
 
 
