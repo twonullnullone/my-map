@@ -45,12 +45,12 @@
     background:
         radial-gradient(
             ellipse at 15% 20%,
-            rgba(255, 0, 70, .5),
+            rgba(255, 0, 70, .88),
             transparent 55%
         ),
         radial-gradient(
             ellipse at 85% 75%,
-            rgba(0, 220, 255, .8),
+            rgba(0, 220, 255, .93),
             transparent 55%
         );
 
