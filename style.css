@@ -671,6 +671,7 @@ body::after {
     border-radius: 10px !important;
 }
 
+
 /* Правая сторона — строго по центру высоты */
 .maplibregl-ctrl-top-right {
     position: absolute !important;
