@@ -629,6 +629,8 @@ body::after {
 
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
     overflow: hidden;
+    position:relative;
+    top:250px;
 }
 
 /* Кнопки */
@@ -698,5 +700,8 @@ body::after {
     margin: 0 0 10px 0 !important;
 }
 
+.maplibregl-map {
+    z-index:9000;
+}
 
 
