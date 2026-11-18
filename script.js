@@ -441,8 +441,8 @@ const themeOverlay = document.getElementById("sergek-theme-overlay");
 const THEME_STORAGE_KEY = "sergekMapTheme";
 
 const themePaths = {
-    default: "mapstyle/test10.json",
-    black3: "mapstyle/light.json",
+    default: "mapstyle/light.json",
+    black3: "mapstyle/test10.json",
     blue: "mapstyle/top1.json",
     green: "mapstyle/ususy.json",
     white: "mapstyle/heudhsu.json",
