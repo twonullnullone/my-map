@@ -1,4 +1,4 @@
-
+/*
 
 
 #bottomBar {
@@ -34,7 +34,7 @@
     overflow: hidden;
 }
 
-/* Glitch colors */
+
 #bottomBar::before {
     content: "";
     position: absolute;
@@ -57,7 +57,7 @@
     filter: blur(28px);
 }
 
-/* White glass reflection */
+
 #bottomBar::after {
     content: "";
     position: absolute;
@@ -79,17 +79,17 @@
         inset 0 1px 2px rgba(255,255,255,.2);
 }
 
-/* Content */
+
 #bottomBar > * {
     position: relative;
     z-index: 3;
 }
 
 
+*/
 
 
-
-/*#bottomBar {
+#bottomBar {
     position: fixed;
     left: 50%;
     bottom: 15px;
@@ -108,11 +108,11 @@
     background: rgb(255 255 255 / 0%);
     backdrop-filter: blur(10px);
 
-    border-radius: 18px;
+    border-radius: 22px;
     box-shadow: 0 8px 25px rgba(0,0,0,.25);
 
     z-index: 2000;
-}*/
+}
 
 
 #bottomBar button {
