@@ -1,108 +1,84 @@
 /* Контейнер кнопок */
-.parent {
+.popup-grid {
     display: grid;
-    width: 100%;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    grid-template-rows: repeat(5, minmax(38px, auto));
-    gap: clamp(4px, 1.5vw, 8px);
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 5px;
+    width: 220px;
+    height: 145px;
 }
 
 /* Общие кнопки */
-.parent button {
-    width: 100%;
-    min-width: 0;
-    min-height: 38px;
-    height: 100%;
-    padding: 6px 3px;
-
+.popup-btn {
     border: none;
-    border-radius: 8px;
-
-    font-size: clamp(9px, 2.5vw, 12px);
+    border-radius: 6px;
+    padding: 4px;
+    font-size: 9px;
     font-weight: 900;
-
     cursor: pointer;
-    transition:
-        transform .2s ease,
-        filter .2s ease,
-        opacity .2s ease;
+    min-width: 0;
+    transition: none;
 }
 
-.parent button:active {
-    transform: scale(.94);
-    filter: brightness(.85);
-}
-
-/* Grid */
+/* 1 */
 .div1 {
     grid-column: span 2;
     grid-row: span 3;
 }
 
+/* 2 */
 .div2 {
-    grid-column: 3 / span 2;
+    grid-column: span 2;
     grid-row: span 2;
+    grid-column-start: 3;
 }
 
+/* 3 */
 .div3 {
-    grid-column: 5;
     grid-row: span 2;
+    grid-column-start: 5;
 }
 
+/* 4 */
 .div4 {
-    grid-column: 5;
-    grid-row: 3 / span 3;
+    grid-row: span 3;
+    grid-column-start: 5;
+    grid-row-start: 3;
 }
 
+/* 5 */
 .div5 {
-    grid-column: 3 / span 2;
-    grid-row: 3 / span 3;
+    grid-column: span 2;
+    grid-row: span 3;
+    grid-column-start: 3;
+    grid-row-start: 3;
 }
 
+/* 6 */
 .div6 {
-    grid-column: 2;
-    grid-row: 4 / span 2;
+    grid-row: span 2;
+    grid-column-start: 2;
+    grid-row-start: 4;
 }
 
-/* Начальное состояние */
-.maplibregl-popup-content {
-    opacity: 0;
-    transform: translateY(12px) scale(.94);
-    transform-origin: bottom center;
-
-    transition:
-        opacity .28s ease,
-        transform .35s cubic-bezier(.16, 1, .3, 1);
-}
-
-/* Открытый popup */
-.maplibregl-popup.is-open .maplibregl-popup-content {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-/* Плавное появление кнопок */
-.parent .popup-btn {
-    opacity: 0;
-    transform: translateY(10px) scale(.92);
-    animation: buttonAppear .35s cubic-bezier(.16, 1, .3, 1) forwards;
-}
-
-.parent .popup-btn:nth-child(1) { animation-delay: .04s; }
-.parent .popup-btn:nth-child(2) { animation-delay: .08s; }
-.parent .popup-btn:nth-child(3) { animation-delay: .12s; }
-.parent .popup-btn:nth-child(4) { animation-delay: .16s; }
-.parent .popup-btn:nth-child(5) { animation-delay: .20s; }
-.parent .popup-btn:nth-child(6) { animation-delay: .24s; }
-.parent .popup-btn:nth-child(7) { animation-delay: .28s; }
-
-@keyframes buttonAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+/* 7 */
 .div7 {
-    grid-column: 1;
-    grid-row: 4 / span 2;
+    grid-row: span 2;
+    grid-column-start: 1;
+    grid-row-start: 4;
+}
+
+.maplibregl-popup {
+    animation: none !important;
+    transition: none !important;
+}
+
+.maplibregl-popup-content {
+    animation: none !important;
+    transition: none !important;
+}
+
+.maplibregl-popup-tip {
+    animation: none !important;
+    transition: none !important;
 }
