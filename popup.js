@@ -155,154 +155,170 @@ function renderMarkers() {
         markers.push(marker);
 
         // POPUP EVENTS
-        popup.on("open", () => {
 
-            const popupEl = popup.getElement()
-                .querySelector(".maplibregl-popup-content");
+// POPUP EVENTS
+popup.on("open", () => {
 
-            if (!popupEl) return;
+    const popupElement = popup.getElement();
+    if (!popupElement) return;
 
-            popupEl.querySelectorAll(".popup-btn").forEach(btn => {
+    const popupEl = popupElement.querySelector(
+        ".maplibregl-popup-content"
+    );
 
-                btn.onclick = async (e) => {
+    if (!popupEl) return;
 
-                    e.stopPropagation();
+    // Плавное появление popup
+    requestAnimationFrame(() => {
+        popupElement.classList.add("is-open");
+    });
 
-                    const action = btn.dataset.action;
+    // Обработчики кнопок
+    popupEl.querySelectorAll(".popup-btn").forEach(btn => {
 
-                    // 2GIS
-                    if (action === "info") {
-                        window.location.href =
-                            `dgis://2gis.kz/geo/${p.lon},${p.lat}`;
+        btn.onclick = async (e) => {
+
+            e.stopPropagation();
+
+            const action = btn.dataset.action;
+
+            // 2GIS
+            if (action === "info") {
+                window.location.href =
+                    `dgis://2gis.kz/geo/${p.lon},${p.lat}`;
+            }
+
+            // GOOGLE MAPS
+            if (action === "googlemaps") {
+
+                const label = encodeURIComponent(p.name || "Точка");
+
+                const isIOS =
+                    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+                    !window.MSStream;
+
+                const url = isIOS
+                    ? `https://maps.google.com/?q=${p.lat},${p.lon}&label=${label}`
+                    : `intent://maps.google.com/maps?q=${p.lat},${p.lon}(${label})#Intent;scheme=https;package=com.google.android.apps.maps;end`;
+
+                window.location.href = url;
+            }
+
+            // YANDEX
+            if (action === "yandex") {
+                window.location.href =
+                    `yandexnavi://build_route_on_map?lat_to=${p.lat}&lon_to=${p.lon}`;
+            }
+
+            // SHARE
+            if (action === "share") {
+
+                const coords =
+                    `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
+
+                try {
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: "Координаты",
+                            text: coords
+                        });
+
+                        showToast("Поделились 📤");
+
+                    } else {
+                        await navigator.clipboard.writeText(coords);
+                        showToast("Координаты скопированы 📋");
                     }
+                } catch {
+                    showToast("Не удалось поделиться");
+                }
+            }
 
-                    // GOOGLE MAPS
-                    if (action === "googlemaps") {
+            // COPY
+            if (action === "copy") {
 
-                        const label = encodeURIComponent(p.name || "Точка");
-                        const isIOS =
-                            /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-                            !window.MSStream;
+                const coords =
+                    `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
 
-                        const url = isIOS
-                            ? `https://maps.google.com/?q=${p.lat},${p.lon}&label=${label}`
-                            : `intent://maps.google.com/maps?q=${p.lat},${p.lon}(${label})#Intent;scheme=https;package=com.google.android.apps.maps;end`;
+                try {
+                    await navigator.clipboard.writeText(coords);
+                    showToast("Координаты скопированы 📋");
 
-                        window.location.href = url;
-                    }
+                } catch {
 
-                    // YANDEX
-                    if (action === "yandex") {
-                        window.location.href =
-                            `yandexnavi://build_route_on_map?lat_to=${p.lat}&lon_to=${p.lon}`;
-                    }
+                    const temp = document.createElement("textarea");
+                    temp.value = coords;
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand("copy");
+                    temp.remove();
 
-                    // SHARE
-                    if (action === "share") {
+                    showToast("Скопировано 📋");
+                }
+            }
 
-                        const coords =
-                            `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
+            // DELETE
+            if (action === "delete") {
 
-                        try {
-                            if (navigator.share) {
-                                await navigator.share({
-                                    title: "Координаты",
-                                    text: coords
-                                });
+                activePoints = activePoints.filter(a =>
+                    !(a.lat === p.lat && a.lon === p.lon)
+                );
 
-                                showToast("Поделились 📤");
+                selectedPoints =
+                    JSON.parse(localStorage.getItem("selectedPoints")) || [];
 
-                            } else {
-                                await navigator.clipboard.writeText(coords);
-                                showToast("Координаты скопированы 📋");
-                            }
-                        } catch {
-                            showToast("Не удалось поделиться");
-                        }
-                    }
+                selectedPoints = selectedPoints.filter(s =>
+                    !(Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
+                      Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001)
+                );
 
-                    // COPY
-                    if (action === "copy") {
+                localStorage.setItem(
+                    "selectedPoints",
+                    JSON.stringify(selectedPoints)
+                );
 
-                        const coords =
-                            `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
+                saveActivePoints();
+                renderMarkers();
+                renderFilterList(allPoints);
 
-                        try {
-                            await navigator.clipboard.writeText(coords);
-                            showToast("Координаты скопированы 📋");
+                popup.remove();
+            }
 
-                        } catch {
+            // SELECT
+            if (action === "select") {
 
-                            const temp = document.createElement("textarea");
-                            temp.value = coords;
-                            document.body.appendChild(temp);
-                            temp.select();
-                            document.execCommand("copy");
-                            temp.remove();
+                selectedPoints =
+                    JSON.parse(localStorage.getItem("selectedPoints")) || [];
 
-                            showToast("Скопировано 📋");
-                        }
-                    }
+                const index = selectedPoints.findIndex(s =>
+                    Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
+                    Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
+                );
 
-                    // DELETE
-                    if (action === "delete") {
+                if (index === -1) {
 
-                        activePoints = activePoints.filter(a =>
-                            !(a.lat === p.lat && a.lon === p.lon)
-                        );
+                    selectedPoints.push({
+                        lat: p.lat,
+                        lon: p.lon
+                    });
 
-                        selectedPoints =
-                            JSON.parse(localStorage.getItem("selectedPoints")) || [];
+                    el.style.background = "#9ACD32";
 
-                        selectedPoints = selectedPoints.filter(s =>
-                            !(Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
-                              Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001)
-                        );
+                } else {
 
-                        localStorage.setItem(
-                            "selectedPoints",
-                            JSON.stringify(selectedPoints)
-                        );
+                    selectedPoints.splice(index, 1);
+                    el.style.background = hexColors[3];
+                }
 
-                        saveActivePoints();
-                        renderMarkers();
-                        renderFilterList(allPoints);
+                localStorage.setItem(
+                    "selectedPoints",
+                    JSON.stringify(selectedPoints)
+                );
+            }
+        };
+    });
+});
 
-                        popup.remove();
-                    }
-
-                    // SELECT
-                    if (action === "select") {
-
-                        selectedPoints =
-                            JSON.parse(localStorage.getItem("selectedPoints")) || [];
-
-                        const index = selectedPoints.findIndex(s =>
-                            Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
-                            Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
-                        );
-
-                        if (index === -1) {
-                            selectedPoints.push({
-                                lat: p.lat,
-                                lon: p.lon
-                            });
-
-                            el.style.background = "#9ACD32";
-
-                        } else {
-                            selectedPoints.splice(index, 1);
-                            el.style.background = hexColors[3];
-                        }
-
-                        localStorage.setItem(
-                            "selectedPoints",
-                            JSON.stringify(selectedPoints)
-                        );
-                    }
-                };
-            });
-        });
     });
 }
 
