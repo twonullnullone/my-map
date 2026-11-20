@@ -48,9 +48,13 @@ function clearMarkers() {
 
 
 
+
 function renderMarkers() {
     markers.forEach(m => m.remove());
     markers = [];
+
+    let selectedPoints =
+        JSON.parse(localStorage.getItem("selectedPoints")) || [];
 
     activePoints.forEach(p => {
 
@@ -67,15 +71,9 @@ function renderMarkers() {
             fontSize: "10px",
             fontWeight: "bold",
             textAlign: "center",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             cursor: "pointer",
             boxShadow: "0 0 6px rgba(0,0,0,0.3)"
         });
-
-        let selectedPoints =
-            JSON.parse(localStorage.getItem("selectedPoints")) || [];
 
         const isSelected = selectedPoints.some(s =>
             Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
@@ -88,14 +86,14 @@ function renderMarkers() {
 
         // POPUP HTML
         const popupHTML = `
-            <div style="min-width:190px; text-align:center;">
+            <div style="min-width:220px; text-align:center;">
 
                 <b>${p.name}</b>
-                <br>
-                ${p.description || ""}
-                <br><br>
+                <div style="font-size:11px; margin:4px 0 8px;">
+                    ${p.description || ""}
+                </div>
 
-                <div class="parent">
+                <div class="popup-grid">
 
                     <button class="popup-btn div1"
                         data-action="info"
@@ -116,21 +114,21 @@ function renderMarkers() {
                     </button>
 
                     <button class="popup-btn div4"
+                        data-action="delete"
+                        style="background:red;color:#fff;">
+                        DELETE
+                    </button>
+
+                    <button class="popup-btn div5"
                         data-action="select"
                         style="background:#000;color:#fff;">
                         SELECT
                     </button>
 
-                    <button class="popup-btn div5"
+                    <button class="popup-btn div6"
                         data-action="share"
                         style="background:blue;color:#fff;">
                         SHARE
-                    </button>
-
-                    <button class="popup-btn div6"
-                        data-action="delete"
-                        style="background:red;color:#fff;">
-                        DELETE
                     </button>
 
                     <button class="popup-btn div7"
@@ -144,180 +142,162 @@ function renderMarkers() {
         `;
 
         const popup = new maplibregl.Popup({
-            offset: 25
+            offset: 25,
+            closeButton: true,
+            closeOnClick: true
         }).setHTML(popupHTML);
 
-        const marker = new maplibregl.Marker({ element: el })
-            .setLngLat([p.lon, p.lat])
-            .setPopup(popup)
-            .addTo(map);
+        const marker = new maplibregl.Marker({
+            element: el
+        })
+        .setLngLat([p.lon, p.lat])
+        .setPopup(popup)
+        .addTo(map);
 
         markers.push(marker);
 
-        // POPUP EVENTS
+        // POPUP BUTTON EVENTS
+        popup.on("open", () => {
 
-// POPUP EVENTS
-popup.on("open", () => {
+            const popupEl = popup.getElement();
+            if (!popupEl) return;
 
-    const popupElement = popup.getElement();
-    if (!popupElement) return;
+            popupEl.querySelectorAll(".popup-btn").forEach(btn => {
 
-    const popupEl = popupElement.querySelector(
-        ".maplibregl-popup-content"
-    );
+                btn.onclick = async (e) => {
 
-    if (!popupEl) return;
+                    const action = e.currentTarget.dataset.action;
 
-    // Плавное появление popup
-    requestAnimationFrame(() => {
-        popupElement.classList.add("is-open");
-    });
-
-    // Обработчики кнопок
-    popupEl.querySelectorAll(".popup-btn").forEach(btn => {
-
-        btn.onclick = async (e) => {
-
-            e.stopPropagation();
-
-            const action = btn.dataset.action;
-
-            // 2GIS
-            if (action === "info") {
-                window.location.href =
-                    `dgis://2gis.kz/geo/${p.lon},${p.lat}`;
-            }
-
-            // GOOGLE MAPS
-            if (action === "googlemaps") {
-
-                const label = encodeURIComponent(p.name || "Точка");
-
-                const isIOS =
-                    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-                    !window.MSStream;
-
-                const url = isIOS
-                    ? `https://maps.google.com/?q=${p.lat},${p.lon}&label=${label}`
-                    : `intent://maps.google.com/maps?q=${p.lat},${p.lon}(${label})#Intent;scheme=https;package=com.google.android.apps.maps;end`;
-
-                window.location.href = url;
-            }
-
-            // YANDEX
-            if (action === "yandex") {
-                window.location.href =
-                    `yandexnavi://build_route_on_map?lat_to=${p.lat}&lon_to=${p.lon}`;
-            }
-
-            // SHARE
-            if (action === "share") {
-
-                const coords =
-                    `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
-
-                try {
-                    if (navigator.share) {
-                        await navigator.share({
-                            title: "Координаты",
-                            text: coords
-                        });
-
-                        showToast("Поделились 📤");
-
-                    } else {
-                        await navigator.clipboard.writeText(coords);
-                        showToast("Координаты скопированы 📋");
+                    // 2GIS
+                    if (action === "info") {
+                        window.location.href =
+                            `dgis://2gis.kz/geo/${p.lon},${p.lat}`;
                     }
-                } catch {
-                    showToast("Не удалось поделиться");
-                }
-            }
 
-            // COPY
-            if (action === "copy") {
+                    // GOOGLE MAPS
+                    if (action === "googlemaps") {
+                        const lat = p.lat;
+                        const lon = p.lon;
 
-                const coords =
-                    `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
+                        const url =
+                            `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 
-                try {
-                    await navigator.clipboard.writeText(coords);
-                    showToast("Координаты скопированы 📋");
+                        window.location.href = url;
+                    }
 
-                } catch {
+                    // YANDEX
+                    if (action === "yandex") {
+                        window.location.href =
+                            `yandexnavi://build_route_on_map?lat_to=${p.lat}&lon_to=${p.lon}`;
+                    }
 
-                    const temp = document.createElement("textarea");
-                    temp.value = coords;
-                    document.body.appendChild(temp);
-                    temp.select();
-                    document.execCommand("copy");
-                    temp.remove();
+                    // SELECT
+                    if (action === "select") {
 
-                    showToast("Скопировано 📋");
-                }
-            }
+                        selectedPoints =
+                            JSON.parse(localStorage.getItem("selectedPoints")) || [];
 
-            // DELETE
-            if (action === "delete") {
+                        const index = selectedPoints.findIndex(s =>
+                            Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
+                            Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
+                        );
 
-                activePoints = activePoints.filter(a =>
-                    !(a.lat === p.lat && a.lon === p.lon)
-                );
+                        if (index === -1) {
+                            selectedPoints.push({
+                                lat: p.lat,
+                                lon: p.lon
+                            });
 
-                selectedPoints =
-                    JSON.parse(localStorage.getItem("selectedPoints")) || [];
+                            el.style.background = "#9ACD32";
 
-                selectedPoints = selectedPoints.filter(s =>
-                    !(Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
-                      Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001)
-                );
+                        } else {
+                            selectedPoints.splice(index, 1);
+                            el.style.background = hexColors[3];
+                        }
 
-                localStorage.setItem(
-                    "selectedPoints",
-                    JSON.stringify(selectedPoints)
-                );
+                        localStorage.setItem(
+                            "selectedPoints",
+                            JSON.stringify(selectedPoints)
+                        );
+                    }
 
-                saveActivePoints();
-                renderMarkers();
-                renderFilterList(allPoints);
+                    // SHARE
+                    if (action === "share") {
 
-                popup.remove();
-            }
+                        const coords = `${Number(p.lat).toFixed(9)}, ${Number(p.lon).toFixed(8)}`;
 
-            // SELECT
-            if (action === "select") {
+                        if (navigator.share) {
+                            try {
+                                await navigator.share({
+                                    title: "Координаты",
+                                    text: coords
+                                });
+                                showToast("Поделились 📤");
+                            } catch {
+                                showToast("Отменено 🙃");
+                            }
+                        } else {
+                            try {
+                                await navigator.clipboard.writeText(coords);
+                                showToast("Скопировано 📋");
+                            } catch {
+                                showToast("Ошибка копирования");
+                            }
+                        }
+                    }
 
-                selectedPoints =
-                    JSON.parse(localStorage.getItem("selectedPoints")) || [];
+                    // COPY
+                    if (action === "copy") {
 
-                const index = selectedPoints.findIndex(s =>
-                    Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
-                    Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
-                );
+                        const coords = `${p.lat}, ${p.lon}`;
 
-                if (index === -1) {
+                        try {
+                            await navigator.clipboard.writeText(coords);
+                            showToast("Координаты скопированы 📋");
+                        } catch {
+                            const temp = document.createElement("textarea");
+                            temp.value = coords;
+                            document.body.appendChild(temp);
+                            temp.select();
+                            document.execCommand("copy");
+                            temp.remove();
 
-                    selectedPoints.push({
-                        lat: p.lat,
-                        lon: p.lon
-                    });
+                            showToast("Скопировано 📋");
+                        }
+                    }
 
-                    el.style.background = "#9ACD32";
+                    // DELETE
+                    if (action === "delete") {
 
-                } else {
+                        activePoints = activePoints.filter(a =>
+                            !(a.lat === p.lat && a.lon === p.lon)
+                        );
 
-                    selectedPoints.splice(index, 1);
-                    el.style.background = hexColors[3];
-                }
+                        selectedPoints =
+                            JSON.parse(localStorage.getItem("selectedPoints")) || [];
 
-                localStorage.setItem(
-                    "selectedPoints",
-                    JSON.stringify(selectedPoints)
-                );
-            }
-        };
-    });
-});
+                        selectedPoints = selectedPoints.filter(s =>
+                            !(s.lat === p.lat && s.lon === p.lon)
+                        );
+
+                        localStorage.setItem(
+                            "selectedPoints",
+                            JSON.stringify(selectedPoints)
+                        );
+
+                        saveActivePoints();
+
+                        popup.remove();
+
+                        renderMarkers();
+                        renderFilterList(allPoints);
+                    }
+
+                };
+
+            });
+
+        });
 
     });
 }
