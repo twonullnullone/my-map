@@ -48,6 +48,21 @@ function clearMarkers() {
 
 
 
+function closePopupAnimated(popup) {
+    const popupEl = popup.getElement();
+    if (!popupEl) {
+        popup.remove();
+        return;
+    }
+
+    popupEl.classList.add("popup-closing");
+
+    setTimeout(() => {
+        popup.remove();
+    }, 200);
+}
+
+
 
 function renderMarkers() {
   markers.forEach((m) => m.remove());
@@ -129,7 +144,20 @@ function renderMarkers() {
       closeButton: true,
       closeOnClick: true
     }).setHTML(popupHTML);
+/////////////////////////////////////
+    let popupClosing = false;
 
+popup.on("close", () => {
+    if (popupClosing) return;
+
+    popupClosing = true;
+
+    const popupEl = popup.getElement();
+    if (!popupEl) return;
+
+    popupEl.classList.add("popup-closing");
+});
+///////////////////////////////////////////////////////////////////
     const marker = new maplibregl.Marker({ element: el })
       .setLngLat([p.lon, p.lat])
       .setPopup(popup)
@@ -220,7 +248,8 @@ function renderMarkers() {
             );
 
             saveActivePoints();
-            popup.remove();
+           // popup.remove();
+            closePopupAnimated(popup);
 
             renderMarkers();
             renderFilterList(allPoints);
