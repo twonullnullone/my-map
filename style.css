@@ -29,7 +29,9 @@ html, body {
 body {
   position: relative;
   margin: 0;
- 
+  
+   -webkit-user-select: none;
+    user-select: none;
  /* min-height: 100vh;*/
   /* твой фон и стили */
 }
@@ -54,6 +56,14 @@ body::after {
     transparent 50%,
     black 75%
   );
+}
+
+input, textarea {
+
+    -webkit-user-select: text;
+
+    user-select: text;
+
 }
 
 #map {
