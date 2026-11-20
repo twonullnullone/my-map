@@ -46,243 +46,263 @@ function clearMarkers() {
     markers = [];
 }
 
+
+
 function renderMarkers() {
-  markers.forEach((m) => m.remove());
-  markers = [];
+    markers.forEach(m => m.remove());
+    markers = [];
 
-  activePoints.forEach((p) => {
-    const el = document.createElement("div");
-    el.className = "marker";
-    el.textContent = p.name;
+    activePoints.forEach(p => {
 
-    // стили
-    el.style.padding = "4px 8px";
-    el.style.background = hexColors[3];
-    el.style.borderRadius = "15px";
-    el.style.border = "3px solid white";
-    el.style.color = "#fff";
-    el.style.fontSize = "10px";
-    el.style.fontWeight = "bold";
-    el.style.textAlign = "center";
-    el.style.display = "flex";
-    el.style.alignItems = "center";
-    el.style.justifyContent = "center";
-    el.style.cursor = "pointer";
-    el.style.boxShadow = "0 0 6px rgba(0,0,0,0.3)";
+        const el = document.createElement("div");
+        el.className = "marker";
+        el.textContent = p.name;
 
-    // --- popup с кнопками ---
-    const popupHTML = `
-      <div style="text-align:center; min-width:150px;">
-        <b>${p.name}</b><br>${p.description}<br><br>
-        <div style="
-          display:flex;
-          justify-content:center;
-          gap:6px;
-          flex-wrap:wrap;">
-          <button class="popup-btn" data-action="info" style="
-            background:#B7E5CD; font-weight:900; color:#000; border:none; border-radius:6px;
-            padding:6px 10px; width:80px; cursor:pointer;">2GIS</button>
-      
-     
-            <button class="popup-btn" data-action="yandex" style="
-  background:#F8B400; font-weight:900; color:#fff; border:none; border-radius:6px;
-  padding:6px 10px; width:80px; cursor:pointer;">YANDEX</button>
+        Object.assign(el.style, {
+            padding: "4px 8px",
+            background: hexColors[3],
+            borderRadius: "15px",
+            border: "3px solid white",
+            color: "#fff",
+            fontSize: "10px",
+            fontWeight: "bold",
+            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            boxShadow: "0 0 6px rgba(0,0,0,0.3)"
+        });
 
-        <button class="popup-btn" data-action="googlemaps" style="
-  background:#fff; border-bottom: 5px solid #000; font-weight:900; color:#000; border:none; border-radius:6px;
-  padding:6px 10px; width:80px; cursor:pointer;">Google</button>
+        let selectedPoints =
+            JSON.parse(localStorage.getItem("selectedPoints")) || [];
 
+        const isSelected = selectedPoints.some(s =>
+            Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
+            Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
+        );
 
-                <button class="popup-btn" data-action="select" style="
-            background:#000; font-weight:900; color:#fff; border:none; border-radius:6px;
-            padding:6px 10px; width:80px; cursor:pointer;">SELECT</button>
+        if (isSelected) {
+            el.style.background = "#9ACD32";
+        }
 
+        // POPUP HTML
+        const popupHTML = `
+            <div style="min-width:190px; text-align:center;">
 
-          <button class="popup-btn" data-action="share" style="
-            background:#0000FF; font-weight:900; color:#fff; border:none; border-radius:6px;
-            padding:6px 10px; width:80px; cursor:pointer;">SHARE</button>
+                <b>${p.name}</b>
+                <br>
+                ${p.description || ""}
+                <br><br>
 
-         <button class="popup-btn" data-action="delete" style="
-            background:red; font-weight:900; color:#fff; border:none; border-radius:6px;
-            padding:6px 10px; width:80px; cursor:pointer;">DELETE</button>
+                <div class="parent">
 
-        </div>
-      </div>
-    `;
+                    <button class="popup-btn div1"
+                        data-action="info"
+                        style="background:#B7E5CD;color:#000;">
+                        2GIS
+                    </button>
 
-    // === создаём popup и marker ===
-    const popup = new maplibregl.Popup({ offset: 25 }).setHTML(popupHTML);
+                    <button class="popup-btn div2"
+                        data-action="yandex"
+                        style="background:#F8B400;color:#fff;">
+                        YANDEX
+                    </button>
 
-    const marker = new maplibregl.Marker({ element: el })
-      .setLngLat([p.lon, p.lat])
-      .setPopup(popup)
-      .addTo(map);
+                    <button class="popup-btn div3"
+                        data-action="googlemaps"
+                        style="background:#fff;color:#000;">
+                        GOOGLE
+                    </button>
 
-    markers.push(marker);
+                    <button class="popup-btn div4"
+                        data-action="select"
+                        style="background:#000;color:#fff;">
+                        SELECT
+                    </button>
 
-    // === Восстановление цвета из localStorage ===
-    let selectedPoints =
-      JSON.parse(localStorage.getItem("selectedPoints")) || [];
+                    <button class="popup-btn div5"
+                        data-action="share"
+                        style="background:blue;color:#fff;">
+                        SHARE
+                    </button>
 
-const isSelected = selectedPoints.some(
-  (s) =>
-    Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
-    Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
-);
+                    <button class="popup-btn div6"
+                        data-action="delete"
+                        style="background:red;color:#fff;">
+                        DELETE
+                    </button>
 
-    if (isSelected) {
-      el.style.background = "#9ACD32";
-      el.style.border = "3px solid #fff";
-    }
+                    <button class="popup-btn div7"
+                        data-action="copy"
+                        style="background:#555;color:#fff;">
+                        COPY
+                    </button>
 
-    // === обработка popup кнопок ===
-    // === обработка popup кнопок (исправленный вариант) ===
-    popup.on("open", () => {
-      const popupEl = popup
-        .getElement()
-        .querySelector(".maplibregl-popup-content");
-      if (!popupEl) return;
+                </div>
+            </div>
+        `;
 
-      popupEl.querySelectorAll(".popup-btn").forEach((btn) => {
-        btn.onclick = (e) => {
-          const action = e.target.dataset.action;
+        const popup = new maplibregl.Popup({
+            offset: 25
+        }).setHTML(popupHTML);
 
-          // --- INFO → 2GIS
-          if (action === "info") {
-            const url = `dgis://2gis.kz/geo/${p.lon},${p.lat}`;
-            window.location.href = url;
-          }
+        const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([p.lon, p.lat])
+            .setPopup(popup)
+            .addTo(map);
 
-if (action === "googlemaps") {
-  const label = encodeURIComponent(p.name || "Точка");
-  const lat = p.lat;
-  const lon = p.lon;
+        markers.push(marker);
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        // POPUP EVENTS
+        popup.on("open", () => {
 
-  let url;
+            const popupEl = popup.getElement()
+                .querySelector(".maplibregl-popup-content");
 
-  if (isIOS) {
-    // Google Maps на iOS
-    url = `https://maps.google.com/?q=${lat},${lon}&label=${label}`;
-    // или Apple Maps:
-    // url = `maps://?q=${label}&ll=${lat},${lon}`;
-  } else {
-    // Android intent
-    url =
-      `intent://maps.google.com/maps?q=${lat},${lon}(${label})` +
-      `#Intent;scheme=https;package=com.google.android.apps.maps;end`;
-  }
+            if (!popupEl) return;
 
-  window.location.href = url;
-}
+            popupEl.querySelectorAll(".popup-btn").forEach(btn => {
 
-          if (action === "yandex") {
-            const latlon = `${p.lat},${p.lon}`;
+                btn.onclick = async (e) => {
 
-            // iOS Яндекс.Навигатор
-            const iosURL = `yandexnavi://build_route_on_map?lat_to=${p.lat}&lon_to=${p.lon}`;
+                    e.stopPropagation();
 
-            // Android Яндекс.Навигатор
-            const androidURL = `yandexnavi://build_route_on_map?lat_to=${p.lat}&lon_to=${p.lon}`;
+                    const action = btn.dataset.action;
 
-            // fallback (если приложение нет) — откроет в браузере Яндекс.Карты
-            /*    const fallback = `https://yandex.kz/maps/?ll=${p.lon}%2C${p.lat}&z=16&pt=${p.lon},${p.lat}`;*/
+                    // 2GIS
+                    if (action === "info") {
+                        window.location.href =
+                            `dgis://2gis.kz/geo/${p.lon},${p.lat}`;
+                    }
 
-            // Попытка открыть приложение
-            window.location.href = iosURL;
+                    // GOOGLE MAPS
+                    if (action === "googlemaps") {
 
-            // fallback через 1 сек
-            /*   setTimeout(() => {
-                    window.location.href = fallback;
-                  }, 1000);*/
-          }
+                        const label = encodeURIComponent(p.name || "Точка");
+                        const isIOS =
+                            /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+                            !window.MSStream;
 
-          // --- COPY
+                        const url = isIOS
+                            ? `https://maps.google.com/?q=${p.lat},${p.lon}&label=${label}`
+                            : `intent://maps.google.com/maps?q=${p.lat},${p.lon}(${label})#Intent;scheme=https;package=com.google.android.apps.maps;end`;
 
-          // --- SHARE только координаты ---
-          if (action === "share") {
-            const coords = `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
+                        window.location.href = url;
+                    }
 
-            if (navigator.share) {
-              navigator
-                .share({
-                  title: "Координаты",
-                  text: coords,
-                })
-                .then(() => showToast("Поделились 📤"))
-                .catch(() => showToast("Отменено 🙃"));
-            } else {
-              // fallback — просто копирование
-              try {
-                navigator.clipboard.writeText(coords);
-                showToast("Координаты скопированы 📋");
-              } catch {
-                const temp = document.createElement("textarea");
-                temp.value = coords;
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand("copy");
-                temp.remove();
-                showToast("Скопировано (fallback) 📋");
-              }
-            }
-          }
+                    // YANDEX
+                    if (action === "yandex") {
+                        window.location.href =
+                            `yandexnavi://build_route_on_map?lat_to=${p.lat}&lon_to=${p.lon}`;
+                    }
 
-          // --- DELETE
-          // --- DELETE
-          if (action === "delete") {
-            // 1) удаляем точку из activePoints
-            activePoints = activePoints.filter(
-              (a) => !(a.lat === p.lat && a.lon === p.lon),
-            );
+                    // SHARE
+                    if (action === "share") {
 
-            // 2) удаляем выделение из selectedPoints
-            selectedPoints = selectedPoints.filter(
-              (s) => !(s.lat === p.lat && s.lon === p.lon),
-            );
-            localStorage.setItem(
-              "selectedPoints",
-              JSON.stringify(selectedPoints),
-            );
+                        const coords =
+                            `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
 
-            // 3) сохраняем и перерисовываем
-            saveActivePoints();
-            renderMarkers();
-            renderFilterList(allPoints);
+                        try {
+                            if (navigator.share) {
+                                await navigator.share({
+                                    title: "Координаты",
+                                    text: coords
+                                });
 
-            // 4) закрываем popup
-            popup.remove();
-          }
+                                showToast("Поделились 📤");
 
-          // --- SELECT
-      if (action === "select") {
+                            } else {
+                                await navigator.clipboard.writeText(coords);
+                                showToast("Координаты скопированы 📋");
+                            }
+                        } catch {
+                            showToast("Не удалось поделиться");
+                        }
+                    }
 
-  // 🔥 ВСЕГДА берём свежие данные
-  selectedPoints =
-    JSON.parse(localStorage.getItem("selectedPoints")) || [];
+                    // COPY
+                    if (action === "copy") {
 
-  const index = selectedPoints.findIndex(
-    (s) =>
-      Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
-      Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
-  );
+                        const coords =
+                            `${p.lat.toFixed(9)}, ${p.lon.toFixed(8)}`;
 
-  if (index === -1) {
-    selectedPoints.push({ lat: p.lat, lon: p.lon });
-    el.style.background = "#9ACD32";
-  } else {
-    selectedPoints.splice(index, 1);
-    el.style.background = hexColors[3];
-  }
+                        try {
+                            await navigator.clipboard.writeText(coords);
+                            showToast("Координаты скопированы 📋");
 
-  localStorage.setItem(
-    "selectedPoints",
-    JSON.stringify(selectedPoints)
-  );
-}
-        };
-      });
+                        } catch {
+
+                            const temp = document.createElement("textarea");
+                            temp.value = coords;
+                            document.body.appendChild(temp);
+                            temp.select();
+                            document.execCommand("copy");
+                            temp.remove();
+
+                            showToast("Скопировано 📋");
+                        }
+                    }
+
+                    // DELETE
+                    if (action === "delete") {
+
+                        activePoints = activePoints.filter(a =>
+                            !(a.lat === p.lat && a.lon === p.lon)
+                        );
+
+                        selectedPoints =
+                            JSON.parse(localStorage.getItem("selectedPoints")) || [];
+
+                        selectedPoints = selectedPoints.filter(s =>
+                            !(Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
+                              Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001)
+                        );
+
+                        localStorage.setItem(
+                            "selectedPoints",
+                            JSON.stringify(selectedPoints)
+                        );
+
+                        saveActivePoints();
+                        renderMarkers();
+                        renderFilterList(allPoints);
+
+                        popup.remove();
+                    }
+
+                    // SELECT
+                    if (action === "select") {
+
+                        selectedPoints =
+                            JSON.parse(localStorage.getItem("selectedPoints")) || [];
+
+                        const index = selectedPoints.findIndex(s =>
+                            Math.abs(Number(s.lat) - Number(p.lat)) < 0.00001 &&
+                            Math.abs(Number(s.lon) - Number(p.lon)) < 0.00001
+                        );
+
+                        if (index === -1) {
+                            selectedPoints.push({
+                                lat: p.lat,
+                                lon: p.lon
+                            });
+
+                            el.style.background = "#9ACD32";
+
+                        } else {
+                            selectedPoints.splice(index, 1);
+                            el.style.background = hexColors[3];
+                        }
+
+                        localStorage.setItem(
+                            "selectedPoints",
+                            JSON.stringify(selectedPoints)
+                        );
+                    }
+                };
+            });
+        });
     });
-  });
 }
+
