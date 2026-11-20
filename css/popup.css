@@ -2,7 +2,7 @@
 .parent {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 2px;
 }
 
@@ -47,10 +47,10 @@
 /* Общий стиль */
 .popup-btn {
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 8px 4px;
   width: 100%;
-  min-height: 38px;
+ /* min-height: 38px;*/
   font-size: 10px;
   font-weight: 900;
   cursor: pointer;
