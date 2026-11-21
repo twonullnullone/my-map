@@ -276,21 +276,19 @@ button {
 ================================ */
 
 .modal-close-button {
-    margin: 16px;
+    margin: 16px 16px 22px 16px;
     padding: 13px 20px;
 
     color: white;
     font-size: 14px;
     font-weight: 600;
 
-    background: linear-gradient(135deg, #ff5f6d, #ff3d57);
+    background: black;
 
     border: none;
     border-radius: 13px;
 
-    box-shadow: 0 6px 18px rgba(255, 61, 87, 0.22);
 
-    cursor: pointer;
 
     transition:
         transform 0.2s ease,
