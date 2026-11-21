@@ -166,7 +166,7 @@ function renderMarker(visible) {
     const markerEl = document.createElement("div");
     Object.assign(markerEl.style, {
       padding: "5px",
-      background: "#00796B",
+      background: "#3b3b3b",
       borderRadius: "10px",
       border: "3px solid white",
       display: "flex",
