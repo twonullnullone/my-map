@@ -11,7 +11,7 @@ function ensureBoxLayer() {
     type: "line",
     source: "frame-geo",
     paint: {
-      "line-color": "#454545",
+      "line-color": "#000",
       "line-width": 3,
       "line-dasharray": [4, 2],
     },
@@ -166,7 +166,7 @@ function renderMarker(visible) {
     const markerEl = document.createElement("div");
     Object.assign(markerEl.style, {
       padding: "5px",
-      background: "#3b3b3b",
+      background: "#000",
       borderRadius: "10px",
       border: "3px solid white",
       display: "flex",
@@ -192,7 +192,7 @@ function renderMarker(visible) {
       <div style="text-align:center;">
         <b>${p.name}</b><br><br>
         <button id="add-point-btn" style="
-          background:#00ff7b;
+          background:#000;
           border:none;
           border-radius:8px;
           padding:6px 14px;
