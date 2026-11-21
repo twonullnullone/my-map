@@ -11,7 +11,7 @@ function ensureBoxLayer() {
     type: "line",
     source: "frame-geo",
     paint: {
-      "line-color": "#00796B",
+      "line-color": "#454545",
       "line-width": 3,
       "line-dasharray": [4, 2],
     },
