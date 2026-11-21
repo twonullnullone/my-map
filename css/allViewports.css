@@ -181,7 +181,7 @@
     overflow-y: auto;
     overscroll-behavior: contain;
 
-    padding: 10px 16px 16px;
+    padding: 10px 4px 16px;
 
     display: flex;
     flex-direction: column;
