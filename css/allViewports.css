@@ -54,6 +54,7 @@
 ================================ */
 
 
+
 .modal-content {
     position: relative;
 
@@ -67,20 +68,20 @@
     overflow: hidden;
 
     background: linear-gradient(
-        160deg,
-        rgba(38, 40, 45, 0.97),
-        rgba(18, 19, 23, 0.99)
+        145deg,
+        rgba(75, 75, 75, 0.48),
+        rgba(30, 30, 30, 0.62)
     );
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 26px 26px 22px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 26px;
 
     box-shadow:
-        0 24px 70px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(30px) saturate(110%);
+    -webkit-backdrop-filter: blur(30px) saturate(110%);
 
     transform: translateY(110%) scale(0.97);
     opacity: 0;
@@ -92,7 +93,7 @@
     will-change: transform, opacity;
 }
 
-/* Верхняя центральная линия */
+/* Верхняя линия */
 .modal-content::before {
     content: "";
 
@@ -107,10 +108,7 @@
 
     border-radius: 10px;
 
-    background: rgba(255, 255, 255, 0.28);
-
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.38);
 
     z-index: 10;
 }
