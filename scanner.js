@@ -197,6 +197,7 @@ function renderMarker(visible) {
           border-radius:8px;
           padding:6px 14px;
           cursor:pointer;
+          color:black;
           font-weight:bold;">
           Добавить
         </button>
