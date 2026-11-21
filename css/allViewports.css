@@ -230,9 +230,17 @@
     gap: 10px;
 
     padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
-
+/*
     background: rgba(0, 0, 0, 0.12);
     border-top: 1px solid rgba(255, 255, 255, 0.07);
+*/
+   position: absolute;
+    justify-content: center;
+    align-items: center;
+    bottom: 0px;
+    text-align: center;
+    left: 0px;
+    right: 0px;
 }
 
 .modal-footer button {
@@ -244,7 +252,7 @@
     font-size: 14px;
     font-weight: 600;
 
-    background: rgba(255, 255, 255, 0.09);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 13px;
 
@@ -255,13 +263,11 @@
         transform 0.2s ease;
 }
 
-.modal-footer button:hover {
-    background: rgba(255, 255, 255, 0.16);
+button {
+    border: none;
 }
 
-.modal-footer button:active {
-    transform: scale(0.97);
-}
+
 
 
 /* ================================
