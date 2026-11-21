@@ -61,6 +61,7 @@
     width: 100%;
     max-width: 500px;
     max-height: 88%;
+   min-height: 350px;
 
     display: flex;
     flex-direction: column;
