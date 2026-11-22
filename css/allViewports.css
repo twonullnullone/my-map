@@ -68,8 +68,7 @@
 
     overflow: hidden;
 
-      background: linear-gradient( 359deg, rgb(0 0 0 / 48%), rgb(76 76 76 / 30%), rgb(0 0 0 / 46%));
-
+      background: rgb(35 35 35);
    
        border-radius: 55px 55px 0px 0px;
 
@@ -89,6 +88,7 @@
 
     will-change: transform, opacity;
    top:15px;
+   padding-bottom: 60px;
 }
 
 /* Верхняя линия */
