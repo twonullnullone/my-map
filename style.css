@@ -58,7 +58,7 @@ body::after {
   );
 }
 
-input, textarea {
+input, textarea, select {
 
     -webkit-user-select: text;
 
@@ -67,7 +67,7 @@ input, textarea {
   resize: none;
 
     
-
+font-size:16px
 }
 
 #map {
