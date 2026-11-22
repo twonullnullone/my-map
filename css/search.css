@@ -1,3 +1,49 @@
+/*popup*/
+.popup-btn-add {
+    display: block;
+
+    width: 100%;
+    max-width: 180px;
+
+    margin: 12px auto 0;
+    padding: 10px 20px;
+
+    background: #353535;
+    color: #fff;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease;
+}
+
+.popup-btn-add:hover {
+    background: #454545;
+}
+
+.popup-btn-add:active {
+    transform: scale(0.96);
+}
+
+/*popup*/
+
+
+
+
+
+
+
+
+
+
+
 /*#search-panel {
     position: absolute;
 
