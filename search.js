@@ -53,6 +53,7 @@ function similarity(a, b) {
 }
 
 // === Локальный поиск ===
+/*
 function searchLocalPoints(query) {
   const q = normalize(query);
   if (!q) return [];
@@ -76,6 +77,63 @@ function searchLocalPoints(query) {
     return false;
   });
 }
+*/
+
+function searchLocalPoints(query) {
+  const q = normalize(query);
+  if (!q) return [];
+
+  // Конвертация обозначений
+  function convertTypes(str) {
+    return str.split(" ").map(token => {
+      if (token === "ovn") return "овн";
+      if (token === "lu") return "лу";
+      if (token === "p") return "п";
+      return token;
+    }).join(" ");
+  }
+
+  const normalizedQuery = convertTypes(q);
+  const tokens = normalizedQuery.split(" ");
+
+  // Ищем тип объекта
+  const type = tokens.find(t =>
+    ["овн", "лу", "п"].includes(t)
+  );
+
+  // Извлекаем номер
+  const digits = normalizedQuery.replace(/\D/g, "");
+
+  // =================================
+  // РЕЖИМ 1: ПОИСК ПО НОМЕРУ NAME
+  // =================================
+
+  if (type && digits) {
+    return points.filter(p => {
+      const name = convertTypes(normalize(p.name || ""));
+
+      const nameDigits = name.replace(/\D/g, "");
+      const nameTokens = name.split(" ");
+
+      const hasType = nameTokens.includes(type);
+      const hasNumber = nameDigits.includes(digits);
+
+      return hasType && hasNumber;
+    });
+  }
+
+  // =================================
+  // РЕЖИМ 2: ПОИСК ПО АДРЕСУ
+  // =================================
+
+  return points.filter(p => {
+    const desc = normalize(p.description || "");
+
+    if (desc.includes(q)) return true;
+
+    return similarity(desc, q) >= 0.5;
+  });
+}
 
 // === Очистка подсказок ===
 function clearSuggestions() {
@@ -93,7 +151,7 @@ function handleSearch(query) {
   results.forEach((p) => {
     const li = document.createElement("li");
     li.className = "suggestion-item local";
-    li.textContent = `📍 ${p.name}: ${p.description}`;
+    li.textContent = `${p.name}: ${p.description}`;
 
     li.addEventListener("click", () => {
       map.flyTo({ center: [p.lon, p.lat], zoom: 17 });
