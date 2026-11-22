@@ -302,7 +302,7 @@ font-size:16px
 
     border-radius: 26px 26px 0 0;
 
-    background: rgba(235,240,233,.94);
+    background: rgba(35,35,35,100%);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
 
@@ -359,18 +359,18 @@ font-size:16px
     gap: 12px;
     padding: 11px;
     border-radius: 12px;
-    color: #222;
+    color: #fff;
     cursor: pointer;
 }
 
 .sergek-theme-list label:has(input:checked) {
-    background: rgba(120,160,90,.18);
+    background: rgb(0 0 0);
 }
 
 .sergek-theme-list input {
     width: 18px;
     height: 18px;
-    accent-color: #739b50;
+    accent-color: #000000;
 }
 
 
