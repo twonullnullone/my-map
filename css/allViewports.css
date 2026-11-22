@@ -295,10 +295,7 @@ button {
         box-shadow 0.2s ease;
 }
 
-.modal-close-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 9px 24px rgba(255, 61, 87, 0.3);
-}
+
 
 .modal-close-button:active {
     transform: scale(0.97);
