@@ -63,6 +63,10 @@ input, textarea {
     -webkit-user-select: text;
 
     user-select: text;
+    
+  resize: none;
+
+    
 
 }
 
