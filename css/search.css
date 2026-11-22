@@ -29,6 +29,18 @@
     transform: scale(0.96);
 }
 
+.popup-btn-add {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.popup-btn-add:focus,
+.popup-btn-add:focus-visible,
+.popup-btn-add:active {
+    outline: none;
+    box-shadow: none;
+}
+
 /*popup*/
 
 
