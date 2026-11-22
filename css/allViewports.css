@@ -357,7 +357,7 @@ button {
 
     box-sizing: border-box;
 
-    background: #f4f5f6;
+    background: #353535;
     border-radius: 22px 22px 0 0;
 
     overflow: hidden;
@@ -405,8 +405,8 @@ button {
     font-family: inherit;
     line-height: 1.5;
 
-    color: #303943;
-    background: #f4f5f6;
+    color: #fff;
+    background: #353535;
 
     border-radius: 12px;
 }
@@ -454,12 +454,18 @@ button {
         background 0.25s,
         transform 0.2s;
 }
+textarea#searchText::placeholder {
+    color: #ffffffed;
+}
 
+span.text {
+    color: #ffffff;
+}
 
 /* OK BUTTON */
 
 #okBtn {
-    background: #303943;
+    background: #000;
     color: #ffffff;
 
     border-radius: 15px 30px 30px 15px;
@@ -470,7 +476,7 @@ button {
 
 #cancelBtn {
     background: #e1e5e9;
-    color: #424b55;
+    color: #000;
 
     border-radius: 30px 15px 15px 30px;
 }
