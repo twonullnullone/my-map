@@ -238,7 +238,7 @@
     left: 50%;
     bottom: 15px;
 
-    transform: translateX(-50%) translateX(17px);
+    transform: translateX(-50%) translateY(17px);
 
     width: 100%;
     max-width: 300px;
@@ -329,7 +329,7 @@
     position: fixed;
     left: 50%;
     bottom: 15px;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(17px);
 
     width: 100%;
     max-width: 300px;
