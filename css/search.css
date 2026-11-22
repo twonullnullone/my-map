@@ -17,16 +17,13 @@
     font-size: 14px;
     font-weight: 500;
 
-    cursor: pointer;
+
 
     transition:
         background 0.2s ease,
         transform 0.15s ease;
 }
 
-.popup-btn-add:hover {
-    background: #454545;
-}
 
 .popup-btn-add:active {
     transform: scale(0.96);
@@ -189,6 +186,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
     color: #eee;
+    margin-bottom:11px;
 
     z-index: 9999;
 }
