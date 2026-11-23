@@ -5,6 +5,42 @@
 .maplibregl-marker {
    /* z-index: 1000 !important;*/
 }
+
+
+#sliderDots {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    z-index: 100;
+}
+
+#sliderDots .dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.3);
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#sliderDots .dot.active {
+    width: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
 /*
 html, body {
     margin: 0;
@@ -798,6 +834,7 @@ font-size:16px
 .maplibregl-map {
   
 }
+
 
 
 
