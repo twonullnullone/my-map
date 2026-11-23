@@ -82,6 +82,7 @@ body {
 }
 
 /* Размытие */
+/*
 #blurfon {
     position: fixed;
     inset: 0;
@@ -114,6 +115,36 @@ input, textarea, select {
 
     
 font-size:16px
+}*/
+#blurfon {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+
+    backdrop-filter: blur(2.5px);
+    -webkit-backdrop-filter: blur(2.5px);
+
+    mask-image: radial-gradient(
+        circle at center,
+        transparent 50%,
+        black 75%
+    );
+
+    -webkit-mask-image: radial-gradient(
+        circle at center,
+        transparent 50%,
+        black 75%
+    );
+}
+
+/* Контролы MapLibre поверх размытия */
+.maplibregl-ctrl-top-left,
+.maplibregl-ctrl-top-right,
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-bottom-right {
+    z-index: 11 !important;
+    position: absolute;
 }
 
 #map {
@@ -767,6 +798,7 @@ font-size:16px
 .maplibregl-map {
   
 }
+
 
 
 
