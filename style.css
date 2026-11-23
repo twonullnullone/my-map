@@ -125,13 +125,18 @@ font-size:16px
     backdrop-filter: blur(2.5px);
     -webkit-backdrop-filter: blur(2.5px);
 
-    mask-image: radial-gradient(
-        circle at center,
-        transparent 50%,
-        black 75%
-    );
+    -webkit-mask-image:
+        radial-gradient(
+            circle at center,
+            transparent 50%,
+            black 75%
+        ),
+        linear-gradient(
+            transparent,
+            transparent
+        );
 
-    -webkit-mask-image: radial-gradient(
+    mask-image: radial-gradient(
         circle at center,
         transparent 50%,
         black 75%
@@ -798,6 +803,7 @@ font-size:16px
 .maplibregl-map {
   
 }
+
 
 
 
