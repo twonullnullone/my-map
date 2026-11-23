@@ -200,7 +200,7 @@
     color: #eee;
     margin-bottom: -21px;
 
-    z-index: 9999;
+    z-index: 15;
 }
 
 
@@ -356,4 +356,5 @@
 #suggestions li:active {
     transform: scale(0.98);
 }
+
 
