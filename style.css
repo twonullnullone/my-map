@@ -34,8 +34,7 @@ body {
     user-select: none;
  // min-height: 100vh;
   // твой фон и стили 
-}*/
-
+}
 body::after {
   content: "";
   position: fixed;
@@ -56,6 +55,53 @@ body::after {
     transparent 50%,
     black 75%
   );
+}*/
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+
+    font-size: 16px;
+    line-height: 1.5;
+    color: #000;
+
+    position: relative;
+    background: transparent;
+    touch-action: pan-x pan-y;
+    overscroll-behavior: none;
+}
+
+body {
+    position: relative;
+    margin: 0;
+
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Размытие */
+#blurfon {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+
+    backdrop-filter: blur(2.5px);
+    -webkit-backdrop-filter: blur(2.5px);
+
+    mask-image: radial-gradient(
+        circle at center,
+        transparent 50%,
+        black 75%
+    );
+
+    -webkit-mask-image: radial-gradient(
+        circle at center,
+        transparent 50%,
+        black 75%
+    );
 }
 
 input, textarea, select {
@@ -292,7 +338,7 @@ font-size:16px
     bottom: 0;
     z-index: 2000;
 
-    width: 100%;
+    width: 97%;
     height: 65vh;
     height: 65dvh;
     box-sizing: border-box;
@@ -311,6 +357,7 @@ font-size:16px
 
     overflow-y: auto;
     pointer-events: none;
+    margin: 2% 2% 0 2%;
 }
 
 #sergek-theme-sheet.active {
@@ -720,6 +767,7 @@ font-size:16px
 .maplibregl-map {
   
 }
+
 
 
 
