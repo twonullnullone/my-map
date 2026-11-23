@@ -347,7 +347,81 @@ setTimeout(() => {
 });
 */
 
+const slider = document.getElementById("bottomSlider");
 
+const slides = [
+    document.getElementById("bottomBar"),
+    document.getElementById("controlPanel"),
+    document.getElementById("search-panel")
+];
+
+const dots = document.querySelectorAll("#sliderDots .dot");
+
+let currentSlide = 0;
+
+function showSlide(index) {
+
+    currentSlide = (index + slides.length) % slides.length;
+
+    slides.forEach((slide, i) => {
+
+        slide.classList.remove("active", "prev", "next");
+
+        if (i === currentSlide) {
+            slide.classList.add("active");
+        } 
+        else if (i < currentSlide) {
+            slide.classList.add("prev");
+        } 
+        else {
+            slide.classList.add("next");
+        }
+
+    });
+
+    // Обновление точек
+    dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === currentSlide);
+    });
+}
+
+// Нажатие на точки
+dots.forEach((dot) => {
+
+    dot.addEventListener("click", () => {
+        showSlide(Number(dot.dataset.index));
+    });
+
+});
+
+// Свайпы
+let touchStartX = 0;
+let touchEndX = 0;
+
+slider.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+slider.addEventListener("touchend", (e) => {
+
+    touchEndX = e.changedTouches[0].screenX;
+
+    const difference = touchEndX - touchStartX;
+
+    if (Math.abs(difference) < 50) return;
+
+    if (difference < 0) {
+        showSlide(currentSlide + 1);
+    } else {
+        showSlide(currentSlide - 1);
+    }
+
+}, { passive: true });
+
+// Начальное состояние
+showSlide(0);
+
+/*ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
 const slider = document.getElementById("bottomSlider");
 
 const slides = [
@@ -406,7 +480,7 @@ slider.addEventListener("touchend", (e) => {
     }
 
 }, { passive: true });
-
+sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss*/
 
 document.getElementById("jsonedit").addEventListener("click", function () {
     Android.openJsonEditor();
@@ -531,3 +605,4 @@ document.querySelectorAll('input[name="sergek-theme"]').forEach(input => {
         applyMapTheme(input.value);
     });
 });
+
