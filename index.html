@@ -288,6 +288,32 @@ function closeModal(id) {
 
     modal.classList.remove("active");
 }
+
+      
+const customAlert = document.getElementById("customAlert");
+const alertMessage = document.getElementById("alertMessage");
+const alertButton = document.getElementById("alertButton");
+
+function showAlert(message) {
+
+    alertMessage.textContent = message;
+
+    customAlert.classList.add("active");
+}
+
+function closeAlert() {
+    customAlert.classList.remove("active");
+}
+
+alertButton.addEventListener("click", closeAlert);
+
+// Закрытие при нажатии вне окна
+customAlert.addEventListener("click", (e) => {
+    if (e.target === customAlert) {
+        closeAlert();
+    }
+});
+
     </script>
 
     <script src="script.js"></script>
@@ -301,6 +327,7 @@ function closeModal(id) {
     <!--<script src="luch.js"></script>-->
   </body>
 </html>
+
 
 
 
