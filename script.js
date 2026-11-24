@@ -242,7 +242,8 @@ document.getElementById("okBtn").onclick = () => {
   console.log(matches);
 
   if (!matches) {
-    alert("Ничего не найдено");
+    showAlert("Ничего не найдено");
+  //  alert("Ничего не найдено");
     return;
   }
 
@@ -304,8 +305,8 @@ document.getElementById("okBtn").onclick = () => {
 
   renderMarkers();
   renderFilterList(allPoints);
-
-  alert(`Добавлено: ${added}`);
+showAlert(`Добавлено: ${added}`);
+//  alert(`Добавлено: ${added}`);
 };
 
 document.getElementById("cancelBtn").onclick = () => {
