@@ -102,12 +102,12 @@ function getDragAfterElement(container, y) {
 
 // === ПОСТРОИТЬ МАРШРУТ ===
 document.getElementById("buildRouteBtn").onclick = () => {
-  if (!userCoords) return alert("Ожидаем ваше местоположение…");
+  if (!userCoords) return showAlert("Ожидаем ваше местоположение…"); /*alert("Ожидаем ваше местоположение…");*/
 
   const checked = Array.from(
     document.querySelectorAll("#routeList input:checked"),
   );
-  if (checked.length < 1) return alert("Выберите хотя бы одну точку");
+  if (checked.length < 1) return showAlert("Выберите хотя бы одну точку"); /*alert("Выберите хотя бы одну точку");*/
 
   currentRoutePoints = checked.map((c) => JSON.parse(c.value));
   routeAutoUpdate = true;
@@ -131,7 +131,9 @@ document.getElementById("endRouteBtn").onclick = () => {
   currentRoutePoints = [];
 
   closeModal("routeModal");
-  alert("🚗 Маршрут завершён");
+  
+showAlert("Маршрут завершён");
+  /*alert("🚗 Маршрут завершён");*/
 };
 
 // === ПОСТРОЕНИЕ МАРШРУТА ===
