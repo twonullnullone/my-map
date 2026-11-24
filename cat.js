@@ -65,7 +65,8 @@ function createCategoryMarker(p, activeSet) {
       saveActivePoints();
       renderMarkers();
       marker.remove();
-      alert(`Точка "${p.name}" добавлена ✅`);
+      showAlert(`Точка "${p.name}" добавлена`);
+      /*alert(`Точка "${p.name}" добавлена ✅`);*/
     };
   });
 }
