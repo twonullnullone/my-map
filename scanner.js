@@ -228,8 +228,8 @@ function renderMarker(visible) {
         visiblePoints = visiblePoints.filter(
           (x) => x.lat !== p.lat || x.lon !== p.lon
         );
-        
-        alert(`Точка "${p.name}" добавлена ✅`);
+        showAlert(`Точка "${p.name}" добавлена`);
+       // alert(`Точка "${p.name}" добавлена ✅`);
       };
     });
 
@@ -344,3 +344,4 @@ function scanPointsInSquare() {
     modalOverlay.style.display = "none";
   };
 });
+
