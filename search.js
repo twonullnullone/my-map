@@ -175,7 +175,8 @@ function handleSearch(query) {
             renderMarkers();
             
             popup.remove();
-            alert(`Точка "${p.name}" добавлена ✅`);
+            showAlert(`Точка "${p.name}" добавлена`);
+           /* alert(`Точка "${p.name}" добавлена ✅`);*/
           };
         }
       }, 50);
