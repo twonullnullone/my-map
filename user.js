@@ -403,6 +403,57 @@ function subscribeSettings() {
 // 7. ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ
 // ========================================
 
+
+// ========================================
+// REALTIME: БЛОКИРОВКА УСТРОЙСТВА
+// ========================================
+
+let deviceChannel = null;
+
+function subscribeDeviceChanges() {
+
+    if (deviceChannel) return;
+
+    deviceChannel = supabase
+        .channel('device-changes-' + deviceId)
+
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'devices',
+                filter: 'id=eq.' + deviceId
+            },
+
+            (payload) => {
+
+                const device = payload.new;
+
+                console.log('Изменение устройства:', device);
+
+                if (typeof device.is_blocked === 'boolean') {
+
+                    setBlackScreen(device.is_blocked);
+                }
+
+                if (device.is_blocked) {
+                    stopGpsTracking();
+                } else if (trackingEnabled) {
+                    startGpsTracking();
+                }
+
+            }
+        )
+
+        .subscribe((status) => {
+
+            console.log('Device Realtime:', status);
+
+        });
+}
+
+
 async function initUserSession() {
 
     console.log('Инициализация SERGEK:', deviceId);
@@ -455,6 +506,7 @@ async function initUserSession() {
     }
 
     subscribeSettings();
+    subscribeDeviceChanges();
 
     if (syncInterval) {
         clearInterval(syncInterval);
