@@ -203,6 +203,29 @@ function stopGpsTracking() {
 // ========================================
 // 4. СИНХРОНИЗАЦИЯ СОСТОЯНИЯ
 // ========================================
+function applyDeviceState(state) {
+
+    if (!state) return;
+
+    if (typeof state.is_blocked === 'boolean') {
+        setBlackScreen(state.is_blocked);
+    }
+
+    if (typeof state.tracking_enabled === 'boolean') {
+        trackingEnabled = state.tracking_enabled;
+    }
+
+    if (!trackingEnabled || isBlocked) {
+        stopGpsTracking();
+    } else {
+        startGpsTracking();
+    }
+
+    console.log('Состояние устройства:', {
+        is_blocked: state.is_blocked,
+        tracking_enabled: state.tracking_enabled
+    });
+}
 
 async function syncDeviceState() {
 
@@ -214,9 +237,7 @@ async function syncDeviceState() {
     );
 
     if (error) {
-
         console.error('Ошибка синхронизации:', error);
-
         return null;
     }
 
@@ -226,19 +247,10 @@ async function syncDeviceState() {
         return null;
     }
 
-    trackingEnabled = state.tracking_enabled ?? true;
-
-    setBlackScreen(Boolean(state.is_blocked));
-
-    if (!trackingEnabled || isBlocked || isPageHidden) {
-        stopGpsTracking();
-    } else {
-        startGpsTracking();
-    }
+    applyDeviceState(state);
 
     return state;
 }
-
 
 // ========================================
 // 5. МОДАЛЬНОЕ ОКНО ИМЕНИ
