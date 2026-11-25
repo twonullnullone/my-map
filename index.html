@@ -57,14 +57,105 @@
 
     
     <!-------base -->
-<div id="name-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
-  <form id="name-form" style="background:#fff; padding:20px; border-radius:8px;">
-    <h3>Введите ваше имя</h3>
-    <input id="name-input" type="text" placeholder="Ваше имя" required />
-    <button type="submit">Войти</button>
-  </form>
+
+<!-- ================================= -->
+<!-- ПОЛЬЗОВАТЕЛЬ -->
+<!-- ================================= -->
+
+<div id="name-modal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+">
+    <form id="name-form" style="
+        background:#fff;
+        padding:20px;
+        border-radius:8px;
+    ">
+        <h3>Введите ваше имя</h3>
+
+        <input
+            id="name-input"
+            type="text"
+            placeholder="Ваше имя"
+            required
+        />
+
+        <button type="submit">Войти</button>
+    </form>
 </div>
+
+
+<!-- ================================= -->
+<!-- АДМИНИСТРАТОР -->
+<!-- ================================= -->
+
+<div id="admin-login">
+    <form id="login-form">
+
+        <input
+            id="admin-email"
+            type="email"
+            placeholder="Admin Email"
+            required
+        />
+
+        <input
+            id="admin-password"
+            type="password"
+            placeholder="Пароль"
+            required
+        />
+
+        <button type="submit">Войти</button>
+
+    </form>
+</div>
+
+
+<div id="admin-panel" style="display:none;">
+
+    <button id="toggle-tracking-btn">
+        Загрузка...
+    </button>
+
+    <button id="logout-btn">
+        Выйти
+    </button>
+
+    <table border="1" cellpadding="8"
+        style="margin-top:16px;width:100%;border-collapse:collapse;">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Первый вход</th>
+                <th>Широта, Долгота</th>
+                <th>Время GPS</th>
+                <th>Статус</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+
+        <tbody id="users-tbody"></tbody>
+
+    </table>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- JAVASCRIPT -->
+<!-- ================================= -->
+
 <script type="module" src="user.js"></script>
+<script type="module" src="admin.js"></script>
+
       <!-------base --> 
 
 
