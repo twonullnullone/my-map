@@ -1,0 +1,361 @@
+
+/* ========================================
+   SERGEK — USER & ADMIN
+======================================== */
+
+:root {
+    --panel-bg: rgba(35, 35, 38, 0.94);
+    --panel-light: rgba(255, 255, 255, 0.07);
+    --border-color: rgba(255, 255, 255, 0.09);
+
+    --text-main: #f1f1f1;
+    --text-muted: #999;
+
+    --accent: #00796B;
+    --accent-hover: #009688;
+
+    --danger: #d9534f;
+
+    --radius: 16px;
+}
+
+
+/* ========================================
+   ОБЩИЕ СТИЛИ
+======================================== */
+
+#name-modal,
+#admin-login {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+
+/* ========================================
+   АНИМАЦИЯ ОКОН
+======================================== */
+
+#name-modal[style*="display: flex"],
+#admin-login {
+    animation: overlayFade .25s ease;
+}
+
+#name-form,
+#login-form {
+    animation: modalScale .3s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes overlayFade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalScale {
+    from {
+        opacity: 0;
+        transform: scale(.88);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* ========================================
+   ФОРМЫ
+======================================== */
+
+#name-form,
+#login-form {
+    width: 100%;
+    max-width: 360px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    padding: 26px;
+
+    background: linear-gradient(
+        145deg,
+        rgba(48, 48, 51, .98),
+        rgba(27, 27, 30, .98)
+    );
+
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+
+    color: var(--text-main);
+}
+
+
+/* ========================================
+   ЗАГОЛОВКИ
+======================================== */
+
+#name-form h3 {
+    margin: 0 0 5px;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    color: var(--text-main);
+}
+
+
+/* ========================================
+   INPUT
+======================================== */
+
+#name-form input,
+#login-form input {
+    width: 100%;
+    height: 48px;
+
+    box-sizing: border-box;
+
+    padding: 0 14px;
+
+    background: rgba(255,255,255,.06);
+
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 11px;
+
+    outline: none;
+
+    color: #fff;
+    font-size: 15px;
+
+    transition:
+        border-color .2s,
+        background .2s,
+        box-shadow .2s;
+}
+
+#name-form input::placeholder,
+#login-form input::placeholder {
+    color: #888;
+}
+
+#name-form input:focus,
+#login-form input:focus {
+    background: rgba(255,255,255,.09);
+
+    border-color: var(--accent);
+
+    box-shadow: 0 0 0 3px rgba(0,121,107,.15);
+}
+
+
+/* ========================================
+   BUTTONS
+======================================== */
+
+#name-form button,
+#login-form button,
+#admin-panel button {
+    min-height: 46px;
+
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 11px;
+
+    background: var(--accent);
+
+    color: #fff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        transform .2s,
+        opacity .2s;
+}
+
+#name-form button:hover,
+#login-form button:hover,
+#admin-panel button:hover {
+    background: var(--accent-hover);
+}
+
+#name-form button:active,
+#login-form button:active,
+#admin-panel button:active {
+    transform: scale(.97);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+
+/* ========================================
+   ADMIN PANEL
+======================================== */
+
+#admin-panel {
+    width: calc(100% - 32px);
+    max-width: 1200px;
+
+    margin: 30px auto;
+    padding: 24px;
+
+    box-sizing: border-box;
+
+    background: var(--panel-bg);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+
+    color: var(--text-main);
+
+    box-shadow: 0 15px 45px rgba(0,0,0,.2);
+
+    overflow: hidden;
+}
+
+
+/* ========================================
+   ADMIN BUTTONS
+======================================== */
+
+#admin-panel button {
+    margin-right: 8px;
+    margin-bottom: 12px;
+}
+
+#logout-btn {
+    background: #555 !important;
+}
+
+#logout-btn:hover {
+    background: #666 !important;
+}
+
+
+/* ========================================
+   TABLE
+======================================== */
+
+#admin-panel table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    color: var(--text-main);
+
+    font-size: 13px;
+}
+
+#admin-panel thead {
+    background: rgba(255,255,255,.07);
+}
+
+#admin-panel th {
+    padding: 14px 12px;
+
+    color: #bbb;
+
+    font-weight: 600;
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+#admin-panel td {
+    padding: 13px 12px;
+
+    border-bottom: 1px solid var(--border-color);
+
+    color: #ddd;
+}
+
+#admin-panel tbody tr {
+    transition: background .2s;
+}
+
+#admin-panel tbody tr:hover {
+    background: rgba(255,255,255,.05);
+}
+
+#admin-panel tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ========================================
+   TABLE SCROLL
+======================================== */
+
+#admin-panel {
+    overflow-x: auto;
+}
+
+#admin-panel table {
+    min-width: 850px;
+}
+
+
+/* ========================================
+   SCROLLBAR
+======================================== */
+
+#admin-panel::-webkit-scrollbar {
+    height: 6px;
+}
+
+#admin-panel::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.2);
+    border-radius: 10px;
+}
+
+#admin-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 600px) {
+
+    #admin-panel {
+        width: calc(100% - 20px);
+        margin: 10px auto;
+        padding: 14px;
+        border-radius: 13px;
+    }
+
+    #name-form,
+    #login-form {
+        padding: 22px;
+    }
+
+    #admin-panel button {
+        font-size: 13px;
+    }
+}
