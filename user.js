@@ -298,15 +298,25 @@ function showNameModal(onSaved) {
                     p_name: chosenName
                 }
             );
+if (error) {
 
-            if (error) {
+    console.error('Ошибка сохранения имени:', error);
 
-                console.error('Ошибка сохранения имени:', error);
+    if (error.message.includes('NAME_ALREADY_TAKEN')) {
+        alert('Это имя уже используется. Пожалуйста, выберите другое.');
+    } else if (error.message.includes('NAME_EMPTY')) {
+        alert('Введите имя.');
+    } else if (error.message.includes('NAME_TOO_LONG')) {
+        alert('Имя не должно превышать 40 символов.');
+    } else {
+        alert('Не удалось сохранить имя: ' + error.message);
+    }
 
-                alert('Не удалось сохранить имя: ' + error.message);
+    nameField.focus();
+    nameField.select();
 
-                return;
-            }
+    return;
+}
 
             const row = Array.isArray(data) ? data[0] : data;
 
