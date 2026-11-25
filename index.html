@@ -59,6 +59,7 @@
     
     <!-------base -->
 
+
 <!-- ================================= -->
 <!-- ПОЛЬЗОВАТЕЛЬ -->
 <!-- ================================= -->
@@ -72,11 +73,7 @@
     justify-content:center;
     z-index:9999;
 ">
-    <form id="name-form" style="
-        background:#fff;
-        padding:20px;
-        border-radius:8px;
-    ">
+    <form id="name-form">
         <h3>Введите ваше имя</h3>
 
         <input
@@ -92,11 +89,18 @@
 
 
 <!-- ================================= -->
-<!-- АДМИНИСТРАТОР -->
+<!-- ВХОД АДМИНИСТРАТОРА -->
 <!-- ================================= -->
 
-<div id="admin-login">
+<button id="admin-entry-btn" type="button">
+    Администратор
+</button>
+
+<div id="admin-login" style="display:none;">
+
     <form id="login-form">
+
+        <h3>Вход администратора</h3>
 
         <input
             id="admin-email"
@@ -114,22 +118,41 @@
 
         <button type="submit">Войти</button>
 
+        <button id="cancel-admin-login" type="button">
+            Отмена
+        </button>
+
     </form>
+
 </div>
 
 
+<!-- ================================= -->
+<!-- ПАНЕЛЬ АДМИНИСТРАТОРА -->
+<!-- ================================= -->
+
 <div id="admin-panel" style="display:none;">
 
-    <button id="toggle-tracking-btn">
-        Загрузка...
-    </button>
+    <h2>Управление SERGEK</h2>
 
-    <button id="logout-btn">
-        Выйти
-    </button>
+    <div id="admin-controls">
+
+        <button id="toggle-tracking-btn">
+            Загрузка...
+        </button>
+
+        <button id="logout-btn">
+            Выйти
+        </button>
+
+    </div>
 
     <table border="1" cellpadding="8"
-        style="margin-top:16px;width:100%;border-collapse:collapse;">
+        style="
+            margin-top:16px;
+            width:100%;
+            border-collapse:collapse;
+        ">
 
         <thead>
             <tr>
@@ -139,7 +162,7 @@
                 <th>Широта, Долгота</th>
                 <th>Время GPS</th>
                 <th>Статус</th>
-                <th>Действие</th>
+                <th>Управление</th>
             </tr>
         </thead>
 
@@ -156,6 +179,7 @@
 
 <script type="module" src="user.js"></script>
 <script type="module" src="admin.js"></script>
+
 
       <!-------base --> 
 
