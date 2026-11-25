@@ -11,10 +11,20 @@ import { createClient } from
 // 1. SUPABASE
 // ========================================
 
+
+
+
+// ========================================
+// 1. CONFIGURATION
+// ========================================
+
 const supabase = createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
 );
+
+// UID из Supabase Authentication → Users
+const ADMIN_UID = 'ВСТАВЬ_USER_UID';
 
 
 // ========================================
@@ -39,26 +49,32 @@ const logoutBtn = document.getElementById('logout-btn');
 // 3. STATE
 // ========================================
 
+let isAdmin = false;
+
 let currentTrackingState = true;
 
 let adminChannel = null;
+let settingsChannel = null;
 
-let isAdmin = false;
 let isLoadingUsers = false;
+let reloadRequested = false;
 
 
 // ========================================
-// 4. UI
+// 4. INTERFACE
 // ========================================
 
 function showLogin() {
+
     isAdmin = false;
 
     loginBox.style.display = 'flex';
     panelBox.style.display = 'none';
 }
 
+
 function showAdminPanel() {
+
     isAdmin = true;
 
     loginBox.style.display = 'none';
@@ -67,7 +83,7 @@ function showAdminPanel() {
 
 
 // ========================================
-// 5. ADMIN LOGIN
+// 5. LOGIN
 // ========================================
 
 loginForm.addEventListener('submit', async (e) => {
@@ -77,39 +93,49 @@ loginForm.addEventListener('submit', async (e) => {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
 
-    const submitBtn = loginForm.querySelector('button[type="submit"]');
+    const submitBtn = loginForm.querySelector(
+        'button[type="submit"]'
+    );
 
-    if (submitBtn) {
-        submitBtn.disabled = true;
-    }
+    submitBtn.disabled = true;
 
     try {
 
-        // Вход в существующий аккаунт
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
 
         if (error) {
+
             alert('Ошибка входа: ' + error.message);
+
             return;
         }
 
-        // Проверяем права администратора
+        // Проверяем UID
+        if (data.user.id !== ADMIN_UID) {
+
+            await supabase.auth.signOut();
+
+            showLogin();
+
+            alert('У вас нет прав администратора');
+
+            return;
+        }
+
         await checkAdminSession();
 
     } catch (err) {
 
-        console.error('Ошибка авторизации:', err);
+        console.error('Ошибка входа:', err);
 
         alert('Ошибка соединения с Supabase');
 
     } finally {
 
-        if (submitBtn) {
-            submitBtn.disabled = false;
-        }
+        submitBtn.disabled = false;
     }
 });
 
@@ -128,44 +154,28 @@ async function checkAdminSession() {
         } = await supabase.auth.getSession();
 
         if (error || !session) {
+
             showLogin();
+
             return;
         }
 
-        // Проверка UID в таблице admins
-        const { data: admin, error: adminError } = await supabase
-            .from('admins')
-            .select('id')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-        if (adminError) {
-
-            console.error('Ошибка проверки администратора:', adminError);
+        // Только указанный UID имеет доступ
+        if (session.user.id !== ADMIN_UID) {
 
             await supabase.auth.signOut();
 
             showLogin();
 
-            alert('Не удалось проверить права администратора');
+            alert('Доступ запрещён');
 
             return;
         }
 
-        if (!admin) {
-
-            console.warn('Пользователь не является администратором');
-
-            await supabase.auth.signOut();
-
-            showLogin();
-
-            alert('У вас нет прав администратора');
-
-            return;
-        }
-
-        console.log('Администратор авторизован:', session.user.email);
+        console.log(
+            'Администратор авторизован:',
+            session.user.email
+        );
 
         showAdminPanel();
 
@@ -174,6 +184,8 @@ async function checkAdminSession() {
         await loadUsers();
 
         subscribeRealtimeAdmin();
+
+        subscribeRealtimeSettings();
 
     } catch (err) {
 
@@ -197,13 +209,18 @@ logoutBtn.addEventListener('click', async () => {
             adminChannel = null;
         }
 
+        if (settingsChannel) {
+            await supabase.removeChannel(settingsChannel);
+            settingsChannel = null;
+        }
+
         await supabase.auth.signOut();
 
         showLogin();
 
         loginForm.reset();
 
-        console.log('Администратор вышел');
+        console.log('Выход выполнен');
 
     } catch (err) {
 
@@ -213,7 +230,7 @@ logoutBtn.addEventListener('click', async () => {
 
 
 // ========================================
-// 8. LOAD GLOBAL GPS SETTINGS
+// 8. LOAD GLOBAL SETTINGS
 // ========================================
 
 async function loadSettings() {
@@ -226,9 +243,9 @@ async function loadSettings() {
 
     if (error) {
 
-        console.error('Ошибка загрузки настроек:', error);
+        console.error('Ошибка настроек:', error);
 
-        toggleTrackingBtn.textContent = 'Ошибка загрузки настроек';
+        toggleTrackingBtn.textContent = 'Ошибка загрузки';
 
         return;
     }
@@ -242,7 +259,7 @@ async function loadSettings() {
 
 
 // ========================================
-// 9. UPDATE GLOBAL GPS BUTTON
+// 9. GLOBAL GPS BUTTON
 // ========================================
 
 function updateTrackingButtonUI() {
@@ -256,10 +273,6 @@ function updateTrackingButtonUI() {
         : '#00796B';
 }
 
-
-// ========================================
-// 10. TOGGLE GLOBAL GPS
-// ========================================
 
 toggleTrackingBtn.addEventListener('click', async () => {
 
@@ -283,14 +296,14 @@ toggleTrackingBtn.addEventListener('click', async () => {
 
             console.error('Ошибка изменения GPS:', error);
 
-            alert('Нет прав или ошибка: ' + error.message);
+            alert('Ошибка: ' + error.message);
 
             return;
         }
 
-        if (!data || data.length === 0) {
+        if (!data || !data.length) {
 
-            alert('Настройки не обновлены. Проверь RLS и права доступа.');
+            alert('Настройки не изменены. Проверь RLS.');
 
             return;
         }
@@ -301,7 +314,7 @@ toggleTrackingBtn.addEventListener('click', async () => {
 
     } catch (err) {
 
-        console.error('Ошибка GPS:', err);
+        console.error(err);
 
         alert('Ошибка соединения');
 
@@ -313,12 +326,18 @@ toggleTrackingBtn.addEventListener('click', async () => {
 
 
 // ========================================
-// 11. LOAD USERS
+// 10. LOAD USERS
 // ========================================
 
 async function loadUsers() {
 
-    if (!isAdmin || isLoadingUsers) return;
+    if (!isAdmin) return;
+
+    // Защита от одновременных запросов
+    if (isLoadingUsers) {
+        reloadRequested = true;
+        return;
+    }
 
     isLoadingUsers = true;
 
@@ -342,7 +361,7 @@ async function loadUsers() {
 
             usersTableBody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center;padding:25px;">
+                    <td colspan="7" style="text-align:center;padding:20px;">
                         Пользователей пока нет
                     </td>
                 </tr>
@@ -377,17 +396,29 @@ async function loadUsers() {
             }
 
             tr.innerHTML = `
-                <td><code>${escapeHtml(u.id)}</code></td>
+                <td>
+                    <code>${escapeHtml(u.id)}</code>
+                </td>
 
-                <td>${escapeHtml(u.name || '-')}</td>
+                <td>
+                    ${escapeHtml(u.name || '-')}
+                </td>
 
-                <td>${escapeHtml(firstSeen)}</td>
+                <td>
+                    ${escapeHtml(firstSeen)}
+                </td>
 
-                <td>${escapeHtml(coordinates)}</td>
+                <td>
+                    ${escapeHtml(coordinates)}
+                </td>
 
-                <td>${escapeHtml(gpsTime)}</td>
+                <td>
+                    ${escapeHtml(gpsTime)}
+                </td>
 
-                <td>${status}</td>
+                <td>
+                    ${status}
+                </td>
 
                 <td>
                     <button
@@ -397,8 +428,8 @@ async function loadUsers() {
                         style="
                             background:${u.is_blocked ? '#00796B' : '#d9534f'};
                             color:white;
+                            border:0;
                             padding:8px 12px;
-                            border:none;
                             border-radius:8px;
                             cursor:pointer;
                         "
@@ -414,12 +445,19 @@ async function loadUsers() {
     } finally {
 
         isLoadingUsers = false;
+
+        if (reloadRequested) {
+
+            reloadRequested = false;
+
+            loadUsers();
+        }
     }
 }
 
 
 // ========================================
-// 12. BLOCK / UNBLOCK DEVICE
+// 11. BLOCK / UNBLOCK USERS
 // ========================================
 
 usersTableBody.addEventListener('click', async (e) => {
@@ -449,14 +487,14 @@ usersTableBody.addEventListener('click', async (e) => {
 
             console.error('Ошибка блокировки:', error);
 
-            alert('Ошибка блокировки: ' + error.message);
+            alert('Ошибка: ' + error.message);
 
             return;
         }
 
         if (!data || data.length === 0) {
 
-            alert('Устройство не обновлено. Проверь права RLS.');
+            alert('Изменения не сохранены. Проверь RLS.');
 
             return;
         }
@@ -465,7 +503,7 @@ usersTableBody.addEventListener('click', async (e) => {
 
     } catch (err) {
 
-        console.error('Ошибка:', err);
+        console.error('Ошибка блокировки:', err);
 
         alert('Ошибка соединения');
 
@@ -477,7 +515,7 @@ usersTableBody.addEventListener('click', async (e) => {
 
 
 // ========================================
-// 13. REALTIME DEVICES
+// 12. REALTIME DEVICES
 // ========================================
 
 function subscribeRealtimeAdmin() {
@@ -502,20 +540,18 @@ function subscribeRealtimeAdmin() {
 
         .subscribe((status) => {
 
-            console.log('Realtime status:', status);
+            console.log('Devices Realtime:', status);
         });
 }
 
 
 // ========================================
-// 14. REALTIME SETTINGS
+// 13. REALTIME SETTINGS
 // ========================================
-
-let settingsChannel = null;
 
 function subscribeRealtimeSettings() {
 
-    if (settingsChannel) return;
+    if (!isAdmin || settingsChannel) return;
 
     settingsChannel = supabase
         .channel('admin-settings')
@@ -530,18 +566,22 @@ function subscribeRealtimeSettings() {
             },
             (payload) => {
 
-                currentTrackingState = payload.new.tracking_enabled;
+                currentTrackingState =
+                    payload.new.tracking_enabled;
 
                 updateTrackingButtonUI();
             }
         )
 
-        .subscribe();
+        .subscribe((status) => {
+
+            console.log('Settings Realtime:', status);
+        });
 }
 
 
 // ========================================
-// 15. HTML ESCAPE
+// 14. ESCAPE HTML
 // ========================================
 
 function escapeHtml(value) {
@@ -557,12 +597,14 @@ function escapeHtml(value) {
 
 
 // ========================================
-// 16. AUTH STATE CHANGES
+// 15. AUTH STATE
 // ========================================
 
 supabase.auth.onAuthStateChange((event, session) => {
 
     if (event === 'SIGNED_OUT') {
+
+        isAdmin = false;
 
         if (adminChannel) {
             supabase.removeChannel(adminChannel);
@@ -580,7 +622,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 
 // ========================================
-// 17. INITIALIZATION
+// 16. INITIALIZATION
 // ========================================
 
 async function initAdmin() {
@@ -588,13 +630,10 @@ async function initAdmin() {
     showLogin();
 
     await checkAdminSession();
-
-    if (isAdmin) {
-        subscribeRealtimeSettings();
-    }
 }
 
 initAdmin();
+
 
 /*
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
