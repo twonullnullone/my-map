@@ -101,6 +101,63 @@ async function syncDeviceState() {
 
   return state;
 }
+function showNameModal(onSaved) {
+  const nameInputModal = document.getElementById('name-modal');
+  const nameForm = document.getElementById('name-form');
+  const nameField = document.getElementById('name-input');
+
+  if (!nameInputModal || !nameForm || !nameField) {
+    console.error('Не найдены элементы формы ввода имени в HTML');
+    return;
+  }
+
+  nameInputModal.style.display = 'flex';
+  nameField.focus();
+
+  async function handleNameSubmit(e) {
+    if (e) e.preventDefault();
+    const chosenName = nameField.value.trim();
+    if (!chosenName) return;
+
+    const submitBtn = nameForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const { data, error } = await supabase.rpc('register_or_update_name', {
+        p_id: deviceId,
+        p_name: chosenName
+      });
+
+      if (error) {
+        console.error('Ошибка register_or_update_name:', error);
+        alert('Не удалось сохранить имя: ' + error.message);
+        return;
+      }
+
+      const row = Array.isArray(data) ? data[0] : data;
+      localStorage.setItem('user_name', chosenName);
+      nameInputModal.style.display = 'none';
+
+      if (row) {
+        trackingEnabled = row.tracking_enabled ?? true;
+        setBlackScreen(Boolean(row.is_blocked));
+      } else {
+        startGpsTracking();
+      }
+
+      if (typeof onSaved === 'function') onSaved();
+    } catch (err) {
+      console.error('Неожиданная ошибка при отправке имени:', err);
+      alert('Ошибка соединения с Supabase');
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  }
+
+  nameForm.onsubmit = handleNameSubmit;
+  const submitBtn = nameForm.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.onclick = handleNameSubmit;
+}
 
 // 5. Инициализация входа пользователя (выбор имени при первом входе)
 async function initUserSession() {
