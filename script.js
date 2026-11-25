@@ -352,35 +352,13 @@ const slider = document.getElementById("bottomSlider");
 const slides = [
     document.getElementById("bottomBar"),
     document.getElementById("controlPanel"),
-    document.getElementById("search-panel"),
-    document.getElementById("admin-panel")
+    document.getElementById("search-panel")
 ];
 
-const dotsContainer = document.getElementById("sliderDots");
+const dots = document.querySelectorAll("#sliderDots .dot");
 
 let currentSlide = 0;
 
-// Создание точек автоматически
-dotsContainer.innerHTML = "";
-
-slides.forEach((_, i) => {
-
-    const dot = document.createElement("button");
-
-    dot.className = "dot";
-    dot.dataset.index = i;
-
-    dot.addEventListener("click", () => {
-        showSlide(i);
-    });
-
-    dotsContainer.appendChild(dot);
-
-});
-
-const dots = dotsContainer.querySelectorAll(".dot");
-
-// Переключение экранов
 function showSlide(index) {
 
     currentSlide = (index + slides.length) % slides.length;
@@ -391,10 +369,10 @@ function showSlide(index) {
 
         if (i === currentSlide) {
             slide.classList.add("active");
-        }
+        } 
         else if (i < currentSlide) {
             slide.classList.add("prev");
-        }
+        } 
         else {
             slide.classList.add("next");
         }
@@ -407,26 +385,40 @@ function showSlide(index) {
     });
 }
 
-// Свайпы на телефоне
+// Нажатие на точки
+dots.forEach((dot) => {
+
+    dot.addEventListener("click", () => {
+        showSlide(Number(dot.dataset.index));
+    });
+
+});
+
+// Свайпы
 let touchStartX = 0;
+let touchEndX = 0;
 
 slider.addEventListener("touchstart", (e) => {
-
     touchStartX = e.changedTouches[0].screenX;
-
 }, { passive: true });
 
 slider.addEventListener("touchend", (e) => {
 
-    const difference = e.changedTouches[0].screenX - touchStartX;
+    touchEndX = e.changedTouches[0].screenX;
+
+    const difference = touchEndX - touchStartX;
 
     if (Math.abs(difference) < 50) return;
 
-    showSlide(currentSlide + (difference < 0 ? 1 : -1));
+    if (difference < 0) {
+        showSlide(currentSlide + 1);
+    } else {
+        showSlide(currentSlide - 1);
+    }
 
 }, { passive: true });
 
-// Начальный экран
+// Начальное состояние
 showSlide(0);
 
 /*ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
