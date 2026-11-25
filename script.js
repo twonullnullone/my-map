@@ -347,19 +347,30 @@ setTimeout(() => {
 
 });
 */
-
 const slider = document.getElementById("bottomSlider");
 
-const slides = [
-    document.getElementById("bottomBar"),
-    document.getElementById("controlPanel"),
-    document.getElementById("search-panel")
-];
-
-const dots = document.querySelectorAll("#sliderDots .dot");
+const slides = document.querySelectorAll(".slider-slide");
+const dotsContainer = document.getElementById("sliderDots");
 
 let currentSlide = 0;
 
+// Создание точек автоматически
+slides.forEach((_, i) => {
+    const dot = document.createElement("span");
+
+    dot.className = "dot";
+    dot.dataset.index = i;
+
+    dotsContainer.appendChild(dot);
+
+    dot.addEventListener("click", () => {
+        showSlide(i);
+    });
+});
+
+const dots = dotsContainer.querySelectorAll(".dot");
+
+// Переключение экранов
 function showSlide(index) {
 
     currentSlide = (index + slides.length) % slides.length;
@@ -370,34 +381,23 @@ function showSlide(index) {
 
         if (i === currentSlide) {
             slide.classList.add("active");
-        } 
+        }
         else if (i < currentSlide) {
             slide.classList.add("prev");
-        } 
+        }
         else {
             slide.classList.add("next");
         }
 
     });
 
-    // Обновление точек
     dots.forEach((dot, i) => {
         dot.classList.toggle("active", i === currentSlide);
     });
 }
 
-// Нажатие на точки
-dots.forEach((dot) => {
-
-    dot.addEventListener("click", () => {
-        showSlide(Number(dot.dataset.index));
-    });
-
-});
-
 // Свайпы
 let touchStartX = 0;
-let touchEndX = 0;
 
 slider.addEventListener("touchstart", (e) => {
     touchStartX = e.changedTouches[0].screenX;
@@ -405,22 +405,16 @@ slider.addEventListener("touchstart", (e) => {
 
 slider.addEventListener("touchend", (e) => {
 
-    touchEndX = e.changedTouches[0].screenX;
-
-    const difference = touchEndX - touchStartX;
+    const difference = e.changedTouches[0].screenX - touchStartX;
 
     if (Math.abs(difference) < 50) return;
 
-    if (difference < 0) {
-        showSlide(currentSlide + 1);
-    } else {
-        showSlide(currentSlide - 1);
-    }
+    showSlide(currentSlide + (difference < 0 ? 1 : -1));
 
 }, { passive: true });
 
 // Начальное состояние
-showSlide(0);
+if (slides.length) showSlide(0);
 
 /*ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
 const slider = document.getElementById("bottomSlider");
