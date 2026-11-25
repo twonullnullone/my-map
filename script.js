@@ -349,23 +349,33 @@ setTimeout(() => {
 */
 const slider = document.getElementById("bottomSlider");
 
-const slides = document.querySelectorAll(".slider-slide");
+const slides = [
+    document.getElementById("bottomBar"),
+    document.getElementById("controlPanel"),
+    document.getElementById("search-panel"),
+    document.getElementById("admin-panel")
+];
+
 const dotsContainer = document.getElementById("sliderDots");
 
 let currentSlide = 0;
 
 // Создание точек автоматически
+dotsContainer.innerHTML = "";
+
 slides.forEach((_, i) => {
-    const dot = document.createElement("span");
+
+    const dot = document.createElement("button");
 
     dot.className = "dot";
     dot.dataset.index = i;
 
-    dotsContainer.appendChild(dot);
-
     dot.addEventListener("click", () => {
         showSlide(i);
     });
+
+    dotsContainer.appendChild(dot);
+
 });
 
 const dots = dotsContainer.querySelectorAll(".dot");
@@ -391,16 +401,19 @@ function showSlide(index) {
 
     });
 
+    // Обновление точек
     dots.forEach((dot, i) => {
         dot.classList.toggle("active", i === currentSlide);
     });
 }
 
-// Свайпы
+// Свайпы на телефоне
 let touchStartX = 0;
 
 slider.addEventListener("touchstart", (e) => {
+
     touchStartX = e.changedTouches[0].screenX;
+
 }, { passive: true });
 
 slider.addEventListener("touchend", (e) => {
@@ -413,8 +426,8 @@ slider.addEventListener("touchend", (e) => {
 
 }, { passive: true });
 
-// Начальное состояние
-if (slides.length) showSlide(0);
+// Начальный экран
+showSlide(0);
 
 /*ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
 const slider = document.getElementById("bottomSlider");
