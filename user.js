@@ -104,61 +104,60 @@ async function syncDeviceState() {
 
 // 5. Инициализация входа пользователя (выбор имени при первом входе)
 async function initUserSession() {
-  const state = await syncDeviceState();
-  let savedName = localStorage.getItem('user_name') || state?.name;
+  let state = null;
 
-  // Если имя ещё не задано — показываем форму ввода имени
-  if (!savedName) {
-    const nameInputModal = document.getElementById('name-modal'); // твой HTML-блок ввода имени
-    const nameForm = document.getElementById('name-form');
-    const nameField = document.getElementById('name-input');
-
-    nameInputModal.style.display = 'flex';
-
-    nameForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const chosenName = nameField.value.trim();
-      if (!chosenName) return;
-
-      const { data, error } = await supabase.rpc('register_or_update_name', {
-        p_id: deviceId,
-        p_name: chosenName
-      });
-
-      if (!error && data && data[0]) {
-        localStorage.setItem('user_name', chosenName);
-        nameInputModal.style.display = 'none';
-        trackingEnabled = data[0].tracking_enabled;
-        setBlackScreen(data[0].is_blocked);
-      }
-    };
-  } else {
-    // Обновляем статус online при повторном заходе
-    await supabase.rpc('register_or_update_name', {
-      p_id: deviceId,
-      p_name: savedName
-    });
+  try {
+    state = await syncDeviceState();
+  } catch (err) {
+    console.error('Ошибка при первичной синхронизации (проверьте SUPABASE_URL и RPC):', err);
   }
 
-  // Подписка на глобальное отключение/включение GPS админом
-  supabase
-    .channel('settings-changes')
-    .on(
-      'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'app_settings', filter: 'id=eq.1' },
-      (payload) => {
-        trackingEnabled = payload.new.tracking_enabled;
-        if (trackingEnabled && !isBlocked) {
-          startGpsTracking();
-        } else {
-          stopGpsTracking();
-        }
-      }
-    )
-    .subscribe();
+  const savedName = localStorage.getItem('user_name') || state?.name;
 
-  // Периодическая проверка блокировки (каждые 4 сек — надёжно и без утечки списка пользователей)
-  setInterval(syncDeviceState, 4000);
+  if (!savedName) {
+    showNameModal();
+  } else {
+    localStorage.setItem('user_name', savedName);
+    try {
+      const { error } = await supabase.rpc('register_or_update_name', {
+        p_id: deviceId,
+        p_name: savedName
+      });
+      if (error) {
+        console.error('Ошибка обновления статуса:', error);
+      }
+    } catch (err) {
+      console.error('Сбой запроса register_or_update_name:', err);
+    }
+  }
+
+  try {
+    supabase
+      .channel('settings-changes')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'app_settings', filter: 'id=eq.1' },
+        (payload) => {
+          trackingEnabled = payload.new.tracking_enabled;
+          if (trackingEnabled && !isBlocked) {
+            startGpsTracking();
+          } else {
+            stopGpsTracking();
+          }
+        }
+      )
+      .subscribe();
+  } catch (err) {
+    console.error('Ошибка подписки Realtime:', err);
+  }
+
+  setInterval(async () => {
+    try {
+      await syncDeviceState();
+    } catch (err) {
+      console.warn('Ошибка фоновой проверки состояния:', err);
+    }
+  }, 4000);
 }
 
 // Статус offline при закрытии вкладки
