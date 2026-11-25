@@ -24,7 +24,7 @@ const supabase = createClient(
 );
 
 // UID из Supabase Authentication → Users
-const ADMIN_UID = 'ВСТАВЬ_USER_UID';
+const ADMIN_UID = '2a753c18-674f-457d-acb8-91859ed6ca56';
 
 
 // ========================================
