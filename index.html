@@ -131,46 +131,7 @@
 <!-- ПАНЕЛЬ АДМИНИСТРАТОРА -->
 <!-- ================================= -->
 
-<div id="admin-panel" style="display:none;">
 
-    <h2>Управление SERGEK</h2>
-
-    <div id="admin-controls">
-
-        <button id="toggle-tracking-btn">
-            Загрузка...
-        </button>
-
-        <button id="logout-btn">
-            Выйти
-        </button>
-
-    </div>
-
-    <table border="1" cellpadding="8"
-        style="
-            margin-top:16px;
-            width:100%;
-            border-collapse:collapse;
-        ">
-
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Имя</th>
-                <th>Первый вход</th>
-                <th>Широта, Долгота</th>
-                <th>Время GPS</th>
-                <th>Статус</th>
-                <th>Управление</th>
-            </tr>
-        </thead>
-
-        <tbody id="users-tbody"></tbody>
-
-    </table>
-
-</div>
 
 
 <!-- ================================= -->
@@ -264,7 +225,7 @@
     </div>
 
 
-
+    <!-- Третий экран -->
     <div id="search-panel" class="slide next">
       <div class="search-bar">
         <!-- Иконка поиска -->
@@ -297,11 +258,53 @@
       <ul id="suggestions"></ul>
     </div>
 
+      <!-- Четвертый экран -->
+  <div id="admin-panel" style="display:none;">
+
+    <h2>Управление SERGEK</h2>
+
+    <div id="admin-controls">
+
+        <button id="toggle-tracking-btn">
+            Загрузка...
+        </button>
+
+        <button id="logout-btn">
+            Выйти
+        </button>
+
+    </div>
+
+    <table border="1" cellpadding="8"
+        style="
+            margin-top:16px;
+            width:100%;
+            border-collapse:collapse;
+        ">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Первый вход</th>
+                <th>Широта, Долгота</th>
+                <th>Время GPS</th>
+                <th>Статус</th>
+                <th>Управление</th>
+            </tr>
+        </thead>
+
+        <tbody id="users-tbody"></tbody>
+
+    </table>
+
+</div>
 
   <div id="sliderDots">
     <button class="dot active" data-index="0"></button>
     <button class="dot" data-index="1"></button>
     <button class="dot" data-index="2"></button>
+    <button class="dot" data-index="3"></button>
 </div>
 
 </div>
