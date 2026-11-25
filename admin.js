@@ -634,6 +634,22 @@ async function initAdmin() {
 
 initAdmin();
 
+// ========================================
+// ВХОД / ВЫХОД ИЗ АДМИН-ПАНЕЛИ
+// ========================================
+
+const adminEntryBtn = document.getElementById('admin-entry-btn');
+const adminLogin = document.getElementById('admin-login');
+const adminPanel = document.getElementById('admin-panel');
+const cancelAdminLogin = document.getElementById('cancel-admin-login');
+
+adminEntryBtn?.addEventListener('click', () => {
+    adminLogin.style.display = 'flex';
+});
+
+cancelAdminLogin?.addEventListener('click', () => {
+    adminLogin.style.display = 'none';
+});
 
 /*
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
