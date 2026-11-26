@@ -215,6 +215,17 @@ font-size:16px
   z-index: 1000;
 }
 
+@media (orientation: landscape) {
+    /* Телефон горизонтально */
+      top: 70px;
+}
+
+@media (orientation: portrait) {
+    /* Телефон вертикально */
+      top: 30px;
+
+}
+
 /* hover */
 .ibutton:hover {
   background: #dcdcdc;
