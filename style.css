@@ -760,8 +760,9 @@ font-size:16px
 
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
     overflow: hidden;
-    position:relative;
-    top:-250px;
+  position: absolute;
+    top: -600%;
+    right: 0px;
 }
 
 /* Кнопки */
