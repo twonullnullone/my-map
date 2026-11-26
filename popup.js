@@ -293,7 +293,7 @@ popup.on("close", () => {
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
-    showToast("Скопировано 📋");
+    showAlert("Скопировано");
   } catch {
     const textarea = document.createElement("textarea");
 
