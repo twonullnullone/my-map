@@ -196,7 +196,7 @@ font-size:16px
 .ibutton {
   position: fixed;
    
-  top: 30px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
 
@@ -217,12 +217,14 @@ font-size:16px
 
 @media (orientation: landscape) {
     /* Телефон горизонтально */
-      top: 70px;
+        #iButton {
+      top: 30px;
+}
 }
 
 @media (orientation: portrait) {
     /* Телефон вертикально */
-      top: 30px;
+      top: 70px;
 
 }
 
