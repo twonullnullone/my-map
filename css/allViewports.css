@@ -426,6 +426,9 @@ button {
 
     box-sizing: border-box;
     gap: 12px;
+   position: absolute;
+    bottom: 0px;
+       margin-bottom: 30px;
 }
 
 
