@@ -498,43 +498,24 @@ function showGpsMessage(loc) {
 
 function checkGpsStatus() {
 
-    if (!navigator.geolocation || gpsCheckInProgress) return;
-
-    gpsCheckInProgress = true;
-
     navigator.geolocation.getCurrentPosition(
 
-        (position) => {
-
-            gpsCheckInProgress = false;
-            lastGpsError = null;
-
+        () => {
+            // GPS работает — ничего не показываем
         },
 
         (error) => {
 
-            gpsCheckInProgress = false;
-
             if (error.code === 1) {
-                lastGpsError = "permission";
+                showAlert("Разрешите доступ к геолокации");
+            }
 
-                showGpsMessage(
-                    "Разрешите доступ к геолокации для Sergek"
-                );
+            if (error.code === 2) {
+                showAlert("Включите геолокацию на устройстве");
+            }
 
-            } else if (error.code === 2) {
-                lastGpsError = "unavailable";
-
-                showGpsMessage(
-                    "Включите геолокацию (GPS) на устройстве"
-                );
-
-            } else if (error.code === 3) {
-                lastGpsError = "timeout";
-
-                showGpsMessage(
-                    "Не удалось определить местоположение"
-                );
+            if (error.code === 3) {
+                console.log("GPS: timeout");
             }
 
         },
