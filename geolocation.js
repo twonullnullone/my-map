@@ -484,7 +484,82 @@ function startWatchingPosition() {
         }
     );
 }
+/* new */
 
+
+
+let gpsCheckTimer = null;
+let gpsCheckInProgress = false;
+let lastGpsError = null;
+
+function showGpsMessage(message) {
+  showAlert(message);
+}
+
+function checkGpsStatus() {
+
+    if (!navigator.geolocation || gpsCheckInProgress) return;
+
+    gpsCheckInProgress = true;
+
+    navigator.geolocation.getCurrentPosition(
+
+        (position) => {
+
+            gpsCheckInProgress = false;
+            lastGpsError = null;
+
+        },
+
+        (error) => {
+
+            gpsCheckInProgress = false;
+
+            if (error.code === 1) {
+                lastGpsError = "permission";
+
+                showGpsMessage(
+                    "Разрешите доступ к геолокации для Sergek"
+                );
+
+            } else if (error.code === 2) {
+                lastGpsError = "unavailable";
+
+                showGpsMessage(
+                    "Включите геолокацию (GPS) на устройстве"
+                );
+
+            } else if (error.code === 3) {
+                lastGpsError = "timeout";
+
+                showGpsMessage(
+                    "Не удалось определить местоположение"
+                );
+            }
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 8000
+        }
+    );
+}
+
+function startGpsStatusCheck() {
+
+    if (gpsCheckTimer !== null) return;
+
+    checkGpsStatus();
+
+    gpsCheckTimer = setInterval(() => {
+        checkGpsStatus();
+    }, 15000);
+}
+
+
+/* new end */
 
 // =========================================
 // КОМПАС
@@ -714,6 +789,8 @@ map.on("load", () => {
 // Если скрипт подключился после загрузки
 if (map.loaded()) {
     startWatchingPosition();
+
+   startGpsStatusCheck();
 }
 
 if (map.isStyleLoaded()) {
@@ -780,7 +857,7 @@ function updateRadarDebug() {
         .map(([key, value]) => `${key}: ${value}`)
 
         .join("\n");
-}*/
+} */
 
 //setInterval(updateRadarDebug, 1000);
 
