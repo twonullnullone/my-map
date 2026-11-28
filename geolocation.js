@@ -492,8 +492,8 @@ let gpsCheckTimer = null;
 let gpsCheckInProgress = false;
 let lastGpsError = null;
 
-function showGpsMessage(message) {
-  showAlert(message);
+function showGpsMessage(loc) {
+  showAlert(loc);
 }
 
 function checkGpsStatus() {
@@ -790,13 +790,19 @@ map.on("load", () => {
 if (map.loaded()) {
     startWatchingPosition();
 
-   startGpsStatusCheck();
+
 }
 
 if (map.isStyleLoaded()) {
     scheduleRadarInit();
 }
 
+map.on("load", () => {
+
+    console.log("MAP LOADED");
+
+   startGpsStatusCheck();
+});
 
 
 // =========================================
